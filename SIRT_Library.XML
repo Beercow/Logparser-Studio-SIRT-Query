@@ -1,0 +1,1365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfLPQuery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <LPQuery>
+    <QueryName>RDP LocalSession: Group by user</QueryName>
+    <QueryDescription>Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational.evtx (EventID 21)</QueryDescription>
+    <QueryData>Select 
+	extract_token(strings, 0, '|') as user,
+	count(*) as CNT
+FROM '[LOGFILEPATH]'
+WHERE EventID = 21
+GROUP BY user
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>ffb22ceb-bc06-49c0-bd43-34e8334c4890</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:29:32.3985108-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>RDP LocalSession: Successful logon</QueryName>
+    <QueryDescription>Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational.evtx (EventID 21)</QueryDescription>
+    <QueryData>Select timegenerated as Date,
+	extract_token(strings, 0, '|') as user,
+	extract_token(strings, 2, '|') as sourceip
+FROM '[LOGFILEPATH]'
+WHERE EventID = 21
+</QueryData>
+    <QueryID>66a59869-b638-4254-9d03-0a664b4fa87d</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:29:55.4703182-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>RDP RemoteSession: Group by user</QueryName>
+    <QueryDescription>Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational.evtx (EventID 1149)</QueryDescription>
+    <QueryData>Select 
+	extract_token(strings, 0, '|') as user,
+	count(*) as CNT
+FROM '[LOGFILEPATH]'
+WHERE EventID = 1149
+GROUP BY user
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>77d3c228-6c6c-4a60-87d3-d758953a0322</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:30:24.0301707-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>RDP RemoteSession: Successful logon</QueryName>
+    <QueryDescription>Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational.evtx (EventID 1149)</QueryDescription>
+    <QueryData>Select timegenerated as Date, 
+	extract_token(strings, 0, '|') as user,
+	extract_token(strings, 2, '|') as sourceip
+FROM '[LOGFILEPATH]'
+WHERE EventID = 1149
+</QueryData>
+    <QueryID>b025bffd-24e5-46b1-9d1d-c05db24d18a1</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:30:47.5506547-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Registry: GUIDs</QueryName>
+    <QueryDescription>Lists GUIDs, Serial numbers and possibly drive letters of usb devices.
+*NOTE: You need to point this at the asset you want to examine.
+Example: FROM \\&lt;computer_name&gt;\HKLM\SYSTEM\MountedDevices</QueryDescription>
+    <QueryData>SELECT ComputerName,
+    CASE STRCNT(ValueName,'DosDevice') WHEN 1 THEN extract_token(ValueName,2,'\\') ELSE '' END as Drive_Letter,
+    REPLACE_CHR(extract_token(ValueName,1,'{'),'}','') as GUID,
+    REPLACE_CHR(extract_token(Value,2,'#'),'.','') as Serial_#
+FROM \HKLM\SYSTEM\MountedDevices
+Where Serial_# Like '%'
+
+
+</QueryData>
+    <QueryID>a675142a-c67b-4cd2-9807-c1ebb9625492</QueryID>
+    <LogType>REGLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-08-21T10:49:27.7863034-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Registry: USB</QueryName>
+    <QueryDescription>Lists Vendor-ID(VID) and Product-ID(PID) of usb devices.
+*NOTE: You need to point this at the asset you want to examine.
+Example: FROM \\&lt;computer_name&gt;\HKLM\SYSTEM\CurrentControlSet\Enum\USB</QueryDescription>
+    <QueryData>SELECT ComputerName,
+    extract_token(extract_token(Path,5,'\\'),0,'&amp;') as VID,
+    extract_token(extract_token(Path,5,'\\'),1,'&amp;') as PID,
+    extract_token(Path,6,'\\') as Serial_#
+
+FROM \HKLM\SYSTEM\CurrentControlSet\Enum\USB
+WHERE VID like '%VID%'
+GROUP by ComputerName, VID, PID, Serial_#
+</QueryData>
+    <QueryID>45fec45f-d5f3-4bd8-a029-fde61cd3def3</QueryID>
+    <LogType>REGLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-08-21T08:55:50.3830254-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Registry: USBSTOR</QueryName>
+    <QueryDescription>Lists Vendor, Product, Version, and Serial number of usb devices.
+*NOTE: You need to point this at the asset you want to examine.
+Example: FROM \\&lt;computer_name&gt;\HKLM\SYSTEM\CurrentControlSet\Enum\USBSTOR</QueryDescription>
+    <QueryData>SELECT ComputerName,
+    extract_token(Path,1,'&amp;') as Vendor,
+    extract_token(Path,2,'&amp;') as Product,
+    extract_token(extract_token(Path,5,'\\'),3,'&amp;') as Version,
+    extract_token(Path,6,'\\') as Serial_#
+FROM \HKLM\SYSTEM\CurrentControlSet\Enum\USBSTOR
+GROUP by ComputerName, Vendor, Product, Version, Serial_#</QueryData>
+    <QueryID>01af254e-6f28-4e0d-b488-29e6e012e0eb</QueryID>
+    <LogType>REGLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-08-21T08:44:55.0939604-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: A registry value was modified</QueryName>
+    <QueryDescription>Security.evtx (EventID 4657)</QueryDescription>
+    <QueryData>SELECT *
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4657
+
+
+</QueryData>
+    <QueryID>615f45dc-b0ba-4963-8f69-0bb11236d71d</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:38:03.9444095-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: An attempt was made to access an object</QueryName>
+    <QueryDescription>Security.evtx (EventID 4663)</QueryDescription>
+    <QueryData>SELECT TimeGenerated as Date,
+	extract_token(strings,0,'|') AS UserSid,
+	extract_token(strings,1,'|') AS UserName,
+	extract_token(strings,2,'|') AS DomainName,
+	extract_token(strings,3,'|') AS LogonID,
+	extract_token(strings,4,'|') AS Server,
+	extract_token(strings,5,'|') AS Type,
+	extract_token(strings,6,'|') AS ObjectName,
+	extract_token(strings,7,'|') AS HandleID,
+	extract_token(strings,8,'|') AS AccessList,
+	extract_token(strings,9,'|') AS AccessMask,
+	extract_token(strings,10,'|') AS ProcessID,
+	extract_token(strings,11,'|') AS ProcessName,
+	extract_token(strings,12,'|') AS ResourceAttributes
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4663</QueryData>
+    <QueryID>a01f8b3d-8408-4d8a-8c89-da37b97f26f8</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T13:13:27.740255-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Eventlog was cleared</QueryName>
+    <QueryDescription>Security.evtx (EventID 1102)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 1, '|') as Username,
+	EXTRACT_TOKEN(Strings, 2, '|') AS Workstation
+FROM '[LOGFILEPATH]'
+WHERE EventID = '1102'</QueryData>
+    <QueryID>52047896-3447-46b0-bc7f-89b48ca37f92</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:31:23.1664225-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: New exception eas added to firewall</QueryName>
+    <QueryDescription>Security.evtx (EventID 4946)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	extract_token(strings, 2, '|') as rulename
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4946
+</QueryData>
+    <QueryID>bcedd0eb-75a2-48b5-9e37-32a20a535d14</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T07:27:47.3055877-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: New exception eas added to firewall (group by rulename)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4946)</QueryDescription>
+    <QueryData>SELECT Count(*) as CNT,
+	extract_token(strings, 2, '|') as rulename
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4946
+GROUP BY rulename
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>5834bef7-a59e-47a9-b5e8-c84138a49531</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T07:29:04.5441962-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: New process was created</QueryName>
+    <QueryDescription>Security.evtx (EventID 4688)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 1, '|') AS Username,
+	EXTRACT_TOKEN(Strings, 2, '|') AS Domain,
+	EXTRACT_TOKEN(Strings, 5, '|') AS Process,
+	EXTRACT_TOKEN(Strings, 13, '|') AS ParentProcess
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4688
+
+
+</QueryData>
+    <QueryID>e80042a3-1018-4ca7-9589-08f489106dfa</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T14:11:28.2390083-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: New process was created (group by ParentProcess)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4688)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 13, '|') AS ParentProcess
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4688
+GROUP BY ParentProcess
+ORDER BY CNT DESC
+
+
+</QueryData>
+    <QueryID>8bd878a9-a5b2-413d-ab7c-6a5a5b340c1f</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T14:11:15.8225487-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: New process was created (group by Process)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4688)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 5, '|') AS Process
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4688
+GROUP BY Process
+ORDER BY CNT DESC
+
+
+</QueryData>
+    <QueryID>69879b27-6efb-4253-8907-f2abde087f66</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:49:57.7948363-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: New process was created (group by username)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4688)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 1, '|') AS Username
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4688
+GROUP BY Username
+ORDER BY CNT DESC
+
+
+</QueryData>
+    <QueryID>3a6c03a9-a2c0-41bb-a7f5-e804ca5a4e1f</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:49:13.9706327-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 8, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 9, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 11, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 17, '|') AS ProcessName,
+	EXTRACT_TOKEN(Strings, 18, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY')
+
+</QueryData>
+    <QueryID>ed8fa8d2-ec94-4853-a6a3-9e2c6ab0f9da</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:11:51.137523-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (console)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 8, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 9, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 11, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 17, '|') AS ProcessName,
+	EXTRACT_TOKEN(Strings, 18, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY') AND
+			LogonType = '2'
+
+</QueryData>
+    <QueryID>a3c4f4e4-2a90-44a0-b72d-a568fbeb929c</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:15:38.3591261-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by authpackage)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 9, '|') as AuthPackage
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624
+GROUP BY AuthPackage
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>38221e43-70c6-4031-b2f9-bd84465d9965</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:28:10.3056625-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by domain)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624
+GROUP BY Domain
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>d3d9cf3e-e0c0-4ff5-ae6f-2c15498f3693</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:27:18.5703094-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by LogonType)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 8, '|') as LogonType
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624
+GROUP BY LogonType
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>44fd88ef-920f-4f3c-b03a-58e6ae6efcac</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:29:08.1927783-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by NTLM users)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 8, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 9, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 11, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 17, '|') AS ProcessName,
+	EXTRACT_TOKEN(Strings, 18, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY') AND
+			AuthPackage LIKE '%NtLmSsp%' AND 
+				Username NOT LIKE '%$'
+GROUP BY Username, Domain, LogonType, AuthPackage, Workstation, ProcessName, SourceIP
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>f813071a-33e5-4246-b6da-d17fd65dda67</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:22:06.8782924-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by ProcName)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 17, '|') as ProcName
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624
+GROUP BY ProcName
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>84c9b715-5429-4850-8196-8ee114d4bf7d</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:30:38.9209203-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by users)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Username NOT LIKE '%$'
+GROUP BY Username
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>ea7138bf-e2c5-40f3-81cb-3c899759cfba</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:26:08.6205448-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (group by Workstation)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 11, '|') as Workstation
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624
+GROUP BY Workstation
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>c7fecd80-5f11-4dec-b80a-63967b4dc5f9</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:29:52.4898156-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (NTLM possible pass-the-hash)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 8, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 9, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 11, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 17, '|') AS ProcessName,
+	EXTRACT_TOKEN(Strings, 18, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY') AND
+			AuthPackage LIKE '%NtLmSsp%' AND 
+				Username NOT LIKE '%$'
+
+</QueryData>
+    <QueryID>8b3ec111-ccb6-4602-ac53-c6b0ce2baf63</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:19:33.1951032-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Successful logon (RDP)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4624)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 8, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 9, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 11, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 17, '|') AS ProcessName,
+	EXTRACT_TOKEN(Strings, 18, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4624 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY') AND
+			LogonType = '10'
+
+</QueryData>
+    <QueryID>77a37cf4-c7f1-4511-8dc5-08614239ea53</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T09:14:23.0875246-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: The Windows Filtering Platform has allowed a connection</QueryName>
+    <QueryDescription>Security.evtx (EventID 5156)</QueryDescription>
+    <QueryData>SELECT TimeGenerated as Date,
+	extract_token(strings,0,'|') AS ProcessID,
+	extract_token(strings,1,'|') AS Application,
+	extract_token(strings,2,'|') AS Direction,
+	extract_token(strings,3,'|') AS SourceAddress,
+	extract_token(strings,4,'|') AS SourcePort,
+	extract_token(strings,5,'|') AS DestAddress,
+	extract_token(strings,6,'|') AS DestPort,
+	extract_token(strings,7,'|') AS Protocol,
+	extract_token(strings,8,'|') AS FilterRTID,
+	extract_token(strings,9,'|') AS LayerName,
+	extract_token(strings,10,'|') AS LayerRTID,
+	extract_token(strings,11,'|') AS RemoteUserID,
+	extract_token(strings,12,'|') AS RemoteMachineID
+FROM '[LOGFILEPATH]'
+WHERE EventID = '5156'
+
+
+
+</QueryData>
+    <QueryID>2df87c4c-1c5b-418f-aba6-d957b657a3fb</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T12:52:16.5606528-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: The Windows Filtering Platform has allowed a connection (group by application)</QueryName>
+    <QueryDescription>Security.evtx (EventID 5156)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	extract_token(strings,1,'|') AS Application
+FROM '[LOGFILEPATH]'
+WHERE EventID = '5156'
+GROUP BY Application
+
+ORDER BY CNT DESC</QueryData>
+    <QueryID>ea4c2e90-5a10-4a67-a2a0-38495cccf3f2</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T13:51:32.0289745-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: The Windows Filtering Platform has blocked a connection</QueryName>
+    <QueryDescription>Security.evtx (EventID 5157)</QueryDescription>
+    <QueryData>SELECT TimeGenerated as Date,
+	extract_token(strings,0,'|') AS ProcessID,
+	extract_token(strings,1,'|') AS Application,
+	extract_token(strings,2,'|') AS Direction,
+	extract_token(strings,3,'|') AS SourceAddress,
+	extract_token(strings,4,'|') AS SourcePort,
+	extract_token(strings,5,'|') AS DestAddress,
+	extract_token(strings,6,'|') AS DestPort,
+	extract_token(strings,7,'|') AS Protocol,
+	extract_token(strings,8,'|') AS FilterRTID,
+	extract_token(strings,9,'|') AS LayerName,
+	extract_token(strings,10,'|') AS LayerRTID,
+	extract_token(strings,11,'|') AS RemoteUserID,
+	extract_token(strings,12,'|') AS RemoteMachineID
+FROM '[LOGFILEPATH]'
+WHERE EventID = '5157'
+
+
+
+</QueryData>
+    <QueryID>5e6396ec-483b-47a3-a7b5-14e03b8cb438</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T13:01:44.2274776-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: The Windows Filtering Platform has permitted a bind to a local port</QueryName>
+    <QueryDescription>Security.evtx (EventID 5158)</QueryDescription>
+    <QueryData>SELECT TimeGenerated as Date,
+	extract_token(strings,0,'|') AS ProcessID,
+	extract_token(strings,1,'|') AS Application,
+	extract_token(strings,2,'|') AS SourceAddress,
+	extract_token(strings,3,'|') AS SourcePort,
+	extract_token(strings,4,'|') AS Protocol,
+	extract_token(strings,5,'|') AS FilterRTID,
+	extract_token(strings,6,'|') AS LayerName
+FROM '[LOGFILEPATH]'
+WHERE EventID = '5158'
+
+
+
+</QueryData>
+    <QueryID>8766eb78-bb59-437f-87b6-d3c10628b1ef</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T13:01:31.9154694-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Unsuccesful logon</QueryName>
+    <QueryDescription>Security.evtx (EventID 4625)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 10, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 11, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 13, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 19, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4625 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY')
+</QueryData>
+    <QueryID>4d0a985c-1e63-400b-84e6-945c3f0ee412</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T07:14:39.6876313-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Unsuccesful logon (group by NTLM users)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4625)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 10, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 11, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 13, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 19, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4625 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY') AND
+			AuthPackage LIKE '%NtLmSsp%' AND
+				Username NOT LIKE '%$'
+GROUP BY Username, Domain, LogonType, AuthPackage, Workstation, SourceIP
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>f24c29c6-add7-4cca-8ab6-762eeda47fef</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T07:18:59.1931593-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Unsuccesful logon (group by username)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4625)</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4625 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Username NOT LIKE '%$'
+GROUP BY Username
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>c35f0557-9677-4059-871f-004540552ddd</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T07:20:53.4349053-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: Unsuccesful logon (NTLM)</QueryName>
+    <QueryDescription>Security.evtx (EventID 4625)</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 5, '|') as Username,
+	EXTRACT_TOKEN(Strings, 6, '|') as Domain,
+	EXTRACT_TOKEN(Strings, 10, '|') as LogonType,
+	EXTRACT_TOKEN(strings, 11, '|') AS AuthPackage,
+	EXTRACT_TOKEN(Strings, 13, '|') AS Workstation,
+	EXTRACT_TOKEN(Strings, 19, '|') AS SourceIP
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4625 AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY') AND
+			AuthPackage LIKE '%NtLmSsp%' AND
+				Username NOT LIKE '%$'
+</QueryData>
+    <QueryID>9432e5fd-6a98-4fbe-ba82-45b9c2b49d5b</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T07:17:29.9440733-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Security: User logoff</QueryName>
+    <QueryDescription>Security.evtx (EventID 4634)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	EXTRACT_TOKEN(Strings, 1, '|') AS Username,
+	EXTRACT_TOKEN(Strings, 2, '|') AS Domain 
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4634 AND
+	Domain NOT IN ('NT AUTHORITY')</QueryData>
+    <QueryID>4f49900a-b7d2-4e7f-b69e-3d56a88ff238</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:31:44.4304334-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: driver load</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 2)</QueryDescription>
+    <QueryData>Select RecordNumber,TimeGenerated,EventID,SourceName,ComputerName,SID, 
+	extract_token(strings,0,'|') AS UtcTime,
+	extract_token(strings,1,'|') AS ImagePath,
+	extract_token(strings,2,'|') AS HashType,
+	extract_token(strings,3,'|') AS Hash,
+	extract_token(strings,4,'|') AS Signed,
+	extract_token(strings,5,'|') AS Signature
+from '[LOGFILEPATH]'
+where EventID = 6</QueryData>
+    <QueryID>5aa3c1b4-4809-48bb-ada7-bf4b8677ca6a</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:38:27.5010287-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: file create file count</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 2)</QueryDescription>
+    <QueryData>Select  
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS TargetPath,
+	count(*) AS FileCount
+from '[LOGFILEPATH]'
+where EventID = 2
+group by ImagePath, TargetPath
+order by FileCount desc</QueryData>
+    <QueryID>033cedf5-175a-4b8a-9ad8-78376ac5c118</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:38:51.3879448-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: file create file count no chrome</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 2)</QueryDescription>
+    <QueryData>Select  
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS TargetPath,
+	count(*) AS FileCount
+from '[LOGFILEPATH]'
+where EventID = 2 and ImagePath not like '%chrome.exe%'
+group by ImagePath, TargetPath
+order by FileCount desc</QueryData>
+    <QueryID>adc62c03-1cdd-46be-8f9a-3430a02e6c77</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:39:04.4288377-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: file create program count</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 2)</QueryDescription>
+    <QueryData>Select  
+	extract_token(strings,3,'|') AS ImagePath,
+	count(*) AS ProgramCount
+from '[LOGFILEPATH]'
+where EventID = 2 
+group by ImagePath
+order by ProgramCount desc</QueryData>
+    <QueryID>3f5a0eff-0757-47a1-8061-a8992b2dc4af</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:39:41.7724484-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: file create time</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 2)</QueryDescription>
+    <QueryData>Select RecordNumber,TimeGenerated,EventID,SourceName,ComputerName,SID, 
+	extract_token(strings,0,'|') AS UtcTime,
+	extract_token(strings,1,'|') AS ProcGuid,
+	extract_token(strings,2,'|') AS ProcId,
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS TargetPath,
+	extract_token(strings,5,'|') AS NewCreateUtc,
+	extract_token(strings,6,'|') AS PrevCreateUtc
+from '[LOGFILEPATH]'
+where EventID = 2</QueryData>
+    <QueryID>0e8551b8-dd05-4609-8eab-246406c7eb3f</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:39:58.8757886-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: file create time backwards</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 2)</QueryDescription>
+    <QueryData>Select RecordNumber,TimeGenerated,EventID,SourceName,ComputerName,SID, 
+	extract_token(strings,0,'|') AS UtcTime,
+	extract_token(strings,1,'|') AS ProcGuid,
+	extract_token(strings,2,'|') AS ProcId,
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS TargetPath,
+	extract_token(strings,5,'|') AS NewCreateUtc,
+	extract_token(strings,6,'|') AS PrevCreateUtc
+from '[LOGFILEPATH]'
+where EventID = 2 and NewCreateUtc &lt; PrevCreateUtc and ImagePath not like '%chrome.exe%'</QueryData>
+    <QueryID>2595c774-bad5-4054-a2ac-df79eca29bcc</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:40:36.3959898-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: image load</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (eventID 7)</QueryDescription>
+    <QueryData>Select RecordNumber,TimeGenerated,EventID,SourceName,ComputerName,SID, 
+	extract_token(strings,0,'|') AS UtcTime,
+	extract_token(strings,1,'|') AS ProcGuid,
+	extract_token(strings,2,'|') AS ProcId,
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS ImageLoaded,
+	extract_token(strings,5,'|') AS HashType,
+	extract_token(strings,6,'|') AS Hash,
+	extract_token(strings,7,'|') AS Signed,
+	extract_token(strings,8,'|') AS Signature
+from '[LOGFILEPATH]'
+where EventID = 7</QueryData>
+    <QueryID>69607233-6f2d-4c52-b5ee-1e6becfa179b</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:40:45.3740907-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: image load wininet winsock32</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 7)</QueryDescription>
+    <QueryData>
+select 
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS ImageLoaded,
+	COUNT(*) AS LoadCount
+from '[LOGFILEPATH]'
+where EventID = 7 and (imageloaded like '%wininet.dll%' or imageloaded like '%winsock32.dll%')
+group by ImagePath, ImageLoaded
+order by LoadCount desc</QueryData>
+    <QueryID>8245fe4c-ac3f-4e52-9a8a-b4129eea465e</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:41:00.8911516-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: network connection</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 3)</QueryDescription>
+    <QueryData>Select RecordNumber,TimeGenerated,EventID,SourceName,ComputerName,SID, 
+	extract_token(strings,0,'|') AS UtcTime,
+	extract_token(strings,1,'|') AS ProcGuid,
+	extract_token(strings,2,'|') AS ProcId,
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS User,
+	extract_token(strings,5,'|') AS Prot,
+	extract_token(strings,6,'|') AS Init,
+	extract_token(strings,7,'|') AS SrcIsIp6,
+	extract_token(strings,8,'|') AS SrcIp,
+	extract_token(strings,9,'|') AS SrcHost,
+	extract_token(strings,10,'|') AS SrcPrt,
+	extract_token(strings,11,'|') AS SrcPrtNam,
+	extract_token(strings,12,'|') AS DstIsIp6,
+	extract_token(strings,13,'|') AS DstIp,
+	extract_token(strings,14,'|') AS DstHost,
+	extract_token(strings,15,'|') AS DstPrt,
+	extract_token(strings,16,'|') AS DstPrtNam
+from '[LOGFILEPATH]'
+where EventID = 3</QueryData>
+    <QueryID>3d9f1274-7b3c-42c3-bd85-84ee05cd48f9</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:41:17.035188-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: network connection count</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 3)</QueryDescription>
+    <QueryData>Select  
+	extract_token(strings,8,'|') AS SrcIp,
+	extract_token(strings,13,'|') AS DstIp,
+	count(*) AS ConCount
+from '[LOGFILEPATH]'
+where EventID = 3
+group by SrcIp, DstIp
+order by ConCount desc</QueryData>
+    <QueryID>ca9b3ab5-394a-41d2-bd1e-d617773b3a04</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:41:36.3150366-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: network connections ip list external</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 3)</QueryDescription>
+    <QueryData>Select
+extract_token(strings,13,'|') AS DstIp,
+count(*) AS ConCount,
+max(extract_token(strings,0,'|')) AS LastDateUtc
+from '[LOGFILEPATH]'
+where EventID = 3 and extract_token(strings,12,'|') = 'false' and 
+	not (DstIp like '10.%' or DstIp like '192.168.%' or
+	     DstIp like '172.1[6-9].%' or DstIp like '172.2_.%' or DstIp like '172.3[01].%' )
+group by DstIp
+order by ConCount desc</QueryData>
+    <QueryID>adab1dcd-54aa-4913-a0b3-08e806feb55b</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:41:51.0359004-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: network socket count</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 3)</QueryDescription>
+    <QueryData>Select  
+	extract_token(strings,8,'|') AS SrcIp,
+	extract_token(strings,10,'|') AS SrcPrt,
+	extract_token(strings,13,'|') AS DstIp,
+	extract_token(strings,15,'|') AS DstPrt,
+	count(*) AS SockCount
+from '[LOGFILEPATH]'
+where EventID = 3
+group by SrcIp, SrcPrt, DstIp, DstPrt
+order by SockCount desc</QueryData>
+    <QueryID>dae12eec-97ba-4045-9cde-f9e1a92e09b8</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:42:02.8595235-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Sysmon: process create terminate</QueryName>
+    <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 1,5)</QueryDescription>
+    <QueryData>Select ComputerName,SID, 
+	CASE EventID When 1 Then 'Process Create' ELSE 'Process terminated' END AS TaskCategory,
+	extract_token(strings,0,'|') AS UtcTime,
+	extract_token(strings,1,'|') AS ProcGuid,
+	extract_token(strings,2,'|') AS ProcId,
+	extract_token(strings,3,'|') AS ImagePath,
+	extract_token(strings,4,'|') AS Params,
+	extract_token(strings,5,'|') AS LogonUser,
+	extract_token(strings,6,'|') AS LogonGuid,
+	extract_token(strings,7,'|') AS LogonId,
+	extract_token(strings,8,'|') AS TermSesId,
+	extract_token(strings,9,'|') AS IntegLvl,
+	extract_token(strings,10,'|') AS HashType,
+	extract_token(strings,11,'|') AS Hash,
+	extract_token(strings,12,'|') AS ParProcGuid,
+	extract_token(strings,13,'|') AS ParProcId,
+	extract_token(strings,14,'|') AS ParImagePath,
+	extract_token(strings,15,'|') AS ParParams
+from '[LOGFILEPATH]'
+where EventID in (1;5)</QueryData>
+    <QueryID>4b3eaf26-e42d-47af-8632-6cecd92338b1</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-21T11:43:06.9571978-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>System: New Service was installed in system</QueryName>
+    <QueryDescription>System.evtx (EventID 7045)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(strings, 0, '|') AS ServiceName,
+	extract_token(strings, 1, '|') AS ServicePath,
+	extract_token(strings, 4, '|') AS ServiceUser
+FROM '[LOGFILEPATH]'
+WHERE EventID = 7045</QueryData>
+    <QueryID>a93a3f82-da72-4307-a7a4-1df74f6d0823</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:32:31.1667407-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>System: Service actions</QueryName>
+    <QueryDescription>System.evtx (EventID 7036)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(strings, 0, '|') AS ServiceName
+FROM '[LOGFILEPATH]'
+WHERE EventID = 7036</QueryData>
+    <QueryID>94a6b946-c726-4ed9-b5cf-9c968a26daf5</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:32:48.7499637-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>System: Service actions ( group by servicejname)</QueryName>
+    <QueryDescription>System.evtx (EventID 7036)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 0, '|') AS ServiceName
+FROM '[LOGFILEPATH]'
+WHERE EventID = 7036
+GROUP BY servicename
+ORDER BY CNT DESC</QueryData>
+    <QueryID>3489782d-160b-48a6-8f42-828c585f6b96</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:33:10.710028-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: Action was executed</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 200)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(strings,0, '|') as taskname,
+	extract_token(strings, 1, '|') as taskaction
+FROM '[LOGFILEPATH]'
+WHERE EventID = 200
+
+</QueryData>
+    <QueryID>0efb45f7-fd7b-458c-85d3-ee32c8e02e22</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:51:18.2089-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: Action was executed (group by action)</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 200)</QueryDescription>
+    <QueryData>Select count(*) as cnt,
+	extract_token(strings, 1, '|') as taskaction
+FROM '[LOGFILEPATH]'
+WHERE EventID = 200
+GROUP BY taskaction
+ORDER BY CNT DESC
+
+</QueryData>
+    <QueryID>71d2131f-06fb-4e55-b8ac-b851b3db8e3d</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:52:23.4407046-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: Task was run</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 100)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(strings,0, '|') as taskname,
+	extract_token(strings, 1, '|') as username
+FROM '[LOGFILEPATH]'
+WHERE EventID = 100
+</QueryData>
+    <QueryID>51ab27ca-bb4c-4b8d-ab01-caed234562f0</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:47:45.5765261-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: Task was run (group by taskname)</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 100)</QueryDescription>
+    <QueryData>Select count(*) as cnt,
+	extract_token(strings,0, '|') as taskname
+FROM '[LOGFILEPATH]'
+WHERE EventID = 100
+GROUP BY taskname
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>4f49685e-cf16-4bcb-a192-b97a3ebceeda</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:49:18.0811693-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: User deleted a task</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 141)</QueryDescription>
+    <QueryData>Select TimeGenerated as Date,
+	extract_token(strings, 0, '|') as taskname,
+	extract_token(strings, 1, '|') as user
+FROM '[LOGFILEPATH]'
+WHERE EventID = 141
+</QueryData>
+    <QueryID>c14815a5-ada0-4092-9472-d9a0ae210727</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:59:05.4765478-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: User deleted a task (group by taskname)</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 141)</QueryDescription>
+    <QueryData>Select count(*) as cnt,
+	extract_token(strings, 0, '|') as taskname
+FROM '[LOGFILEPATH]'
+WHERE EventID = 141
+GROUP BY taskname
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>10f50bab-416c-468a-aec4-1ae5daa9c585</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:57:58.3923608-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: User deleted a task (group by user)</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 141)</QueryDescription>
+    <QueryData>Select count(*) as cnt,
+	extract_token(strings, 1, '|') as user
+FROM '[LOGFILEPATH]'
+WHERE EventID = 141
+GROUP BY user
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>5421482b-c623-49dd-90c1-ad7ae4a215ae</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:57:43.6624475-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: User updated a task</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 140)</QueryDescription>
+    <QueryData>Select TimeGenerated as Date,
+	extract_token(strings, 0, '|') as taskname,
+	extract_token(strings, 1, '|') as user
+FROM '[LOGFILEPATH]'
+WHERE EventID = 140
+
+</QueryData>
+    <QueryID>cec2be21-3e79-4a76-8dae-76f68eaffca6</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:54:20.6084261-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: User updated a task (group by taskname)</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 140)</QueryDescription>
+    <QueryData>Select count(*) as cnt,
+	extract_token(strings, 0, '|') as taskname
+FROM '[LOGFILEPATH]'
+WHERE EventID = 140
+GROUP BY taskname
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>b438fa7d-e136-4a96-9c85-913219014673</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:56:06.9432387-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Task Scheduler: User updated a task (group by user)</QueryName>
+    <QueryDescription>Microsoft-Windows-TaskScheduler%4Operational.evtx (EventID 140)</QueryDescription>
+    <QueryData>Select count(*) as cnt,
+	extract_token(strings, 1, '|') as user
+FROM '[LOGFILEPATH]'
+WHERE EventID = 140
+GROUP BY user
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>862f9e29-accf-44ee-b6de-b047d0b3a64c</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:55:17.7915208-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Firewall blocked inbound connections to the application, but did not notify the user</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2011)</QueryDescription>
+    <QueryData>Select Timegenerated as date,
+	extract_token(strings, 1, '|') as file,
+	extract_token(strings, 4, '|') as port
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2011
+</QueryData>
+    <QueryID>a6aaa9b0-1737-4920-be3e-85c9fa5adcfb</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:33:34.2223332-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Firewall blocked inbound connections to the application, but did not notify the user (group by application)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2011)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 1, '|') as file
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2011
+GROUP BY file
+ORDER BY CNT DESC
+</QueryData>
+    <QueryID>7cd6a480-576c-4a62-bcb7-3fca17e4188c</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:33:47.9502742-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: New exception rule was added</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2004)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(strings, 1, '|') as rulename,
+	extract_token(strings, 3, '|') as apppath,
+	extract_token(strings, 22, '|') as changedapp
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2004</QueryData>
+    <QueryID>b14f0d18-0902-4ead-b74c-e0ba9c0b813d</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:34:06.6224757-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was added (group by apppath)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2004)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 3, '|') as apppath
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2004
+GROUP BY apppath
+ORDER BY CNT DESC</QueryData>
+    <QueryID>b512cd4d-bda6-4429-9758-8748c9d2a172</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:34:19.1502844-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was changed</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2005)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(Strings, 1, '|') as rulename,
+	extract_token(Strings, 3, '|') AS apppath, 
+	extract_token(Strings, 4, '|') AS servicename,
+	extract_token(strings, 7, '|') AS localport,
+	extract_token(strings, 22, '|') as modifyingapp  
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2005</QueryData>
+    <QueryID>d98b924e-c400-49f9-901a-dcf35bb25703</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:36:50.5406759-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was changed (group by apppath)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2005)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 3, '|') as apppath
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2005
+GROUP BY apppath
+ORDER BY CNT DESC</QueryData>
+    <QueryID>5e296024-4e3c-465a-aaba-a2cd9d65c1f9</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:34:40.9743264-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was changed (group by localport)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2005)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 7, '|') as localport
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2005
+GROUP BY localport
+ORDER BY CNT DESC</QueryData>
+    <QueryID>e9bfdd78-0808-4cdc-a745-646ee0eb6be3</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:34:54.3023196-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was changed (group by modifyingapp)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2005)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 22, '|') as modifyingapp
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2005
+GROUP BY modifyingapp
+ORDER BY CNT DESC</QueryData>
+    <QueryID>3829cd08-7084-4fd0-836b-48eb4fbb4d82</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T14:12:38.3600958-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was changed (group by rulename)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2005)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 1, '|') as rulename
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2005
+GROUP BY rulename
+ORDER BY CNT DESC</QueryData>
+    <QueryID>2bcb64a5-af85-424a-895d-e0f52a86fd82</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:35:08.7332558-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was changed (group by servicename)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2005)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(strings, 4, '|') as servicename
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2005
+GROUP BY servicename
+ORDER BY CNT DESC</QueryData>
+    <QueryID>b91552ac-a564-40a0-be89-b1c66e2a883d</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:35:26.742104-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was deleted</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2006)</QueryDescription>
+    <QueryData>Select TimeGenerated AS Date,
+	extract_token(Strings, 1, '|') as rulename,
+	extract_token(strings, 3, '|') as changedapp
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2006</QueryData>
+    <QueryID>f20b6c02-c92d-4a61-a304-e6557958c340</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:35:52.6538012-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was deleted (group by changedapp)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2006)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(Strings, 3, '|') as changedapp
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2006
+GROUP BY changedapp
+ORDER BY CNT DESC</QueryData>
+    <QueryID>9602bd5b-1816-4e87-b0c8-e12a683f2fde</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:36:07.1499239-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Windows Firewall: Rule was deleted (group by rulename)</QueryName>
+    <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2006)</QueryDescription>
+    <QueryData>Select COUNT(*) as CNT,
+	extract_token(Strings, 1, '|') as rulename
+FROM '[LOGFILEPATH]'
+WHERE EventID = 2006
+GROUP BY rulename
+ORDER BY CNT DESC</QueryData>
+    <QueryID>e193bffe-b0ee-479a-9c55-3b2f2963bb62</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-06-20T08:36:18.3496705-05:00</DateModified>
+  </LPQuery>
+</ArrayOfLPQuery>
