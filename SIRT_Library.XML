@@ -85,6 +85,76 @@ Where Serial_# Like '%'
     <DateModified>2017-08-21T10:49:27.7863034-05:00</DateModified>
   </LPQuery>
   <LPQuery>
+    <QueryName>Registry: Last Access Time</QueryName>
+    <QueryDescription>(1 = Disabled) If disabled, the last access timestamp recording in the file system will not occur.</QueryDescription>
+    <QueryData>SELECT ComputerName, Value
+FROM \HKLM\SYSTEM\CurrentControlSet\Control\FileSystem
+WHERE ValueName = 'NtfsDisableLastAccessUpdate'
+</QueryData>
+    <QueryID>72e342a9-a203-43af-b655-cd972d5bdd1f</QueryID>
+    <LogType>REGLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-08-22T10:58:11.5681278-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Registry: Shares</QueryName>
+    <QueryDescription>Lists the open network shares on the system</QueryDescription>
+    <QueryData>SELECT ComputerName, ValueName as ShareName,
+    CASE STRCNT(Value,'CSCFlags=0') WHEN 1 THEN 'Default' ELSE 
+        CASE STRCNT(Value,'CSCFlags=16')  WHEN 1 THEN 'Auto Doc Caching' ELSE
+            CASE STRCNT(Value,'CSCFlags=32')  WHEN 1 THEN 'Auto Program Caching' ELSE 
+                CASE STRCNT(Value,'CSCFlags=48')  WHEN 1 THEN 'Cashing Disabled' ELSE
+                    CASE STRCNT(Value,'CSCFlags=2048')  WHEN 1 THEN 'Default Win7-10' ELSE
+                        Value
+                    END
+                END
+            END
+        END
+    END as CSCFlag,
+    CASE STRCNT(Value,'Permissions=0') WHEN 1 THEN 'GUI/PowerShell' ELSE
+        CASE STRCNT(Value,'Permissions=9') WHEN 1 THEN 'Advanced File Sharing' ELSE
+            CASE STRCNT(Value,'Permissions63') WHEN 1 THEN 'Command Line' ELSE
+                Value
+            END
+        END
+    END as Created_Via,
+    CASE STRCNT(Value,'Type=0') WHEN 1 THEN 'Disk Drive/Folder' ELSE
+        CASE STRCNT(Value,'Type=1') WHEN 1 THEN 'Printer' ELSE
+            CASE STRCNT(Value,'Type=2') WHEN 1 THEN 'Device' ELSE
+                CASE STRCNT(Value,'Type=3') WHEN 1 THEN 'IPC' ELSE
+                    CASE STRCNT(Value,'Type=2147483648') WHEN 1 THEN 'Admin' ELSE
+                        Value
+                    END
+                END
+            END 
+        END
+    END as Type,
+    extract_token(extract_token(Value,1,'Path='),0,'|') as Path,
+    extract_token(extract_token(Value,1,'MaxUses='),0,'|') as MaxUsers
+FROM \\oskcor20018316\HKLM\SYSTEM\CurrentControlSet\Services\lanmanserver\Shares
+Where KeyName = 'Shares'
+</QueryData>
+    <QueryID>4736b13b-92b9-4845-b04f-4e33576dab18</QueryID>
+    <LogType>REGLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-08-22T14:04:13.3453783-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Registry: TimeZoneInformation</QueryName>
+    <QueryDescription>Identifies the current system time zone</QueryDescription>
+    <QueryData>SELECT ComputerName, Value
+FROM \HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation
+WHERE ValueName = 'TimeZoneKeyName'
+</QueryData>
+    <QueryID>45c1dcd8-e9e3-4bc5-9bfb-763ef83ee10e</QueryID>
+    <LogType>REGLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>false</IsFavorite>
+    <DateModified>2017-08-22T13:12:55.381137-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
     <QueryName>Registry: USB</QueryName>
     <QueryDescription>Lists Vendor-ID(VID) and Product-ID(PID) of usb devices.
 *NOTE: You need to point this at the asset you want to examine.
