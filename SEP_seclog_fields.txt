@@ -1,0 +1,27 @@
+Date and Time (2)
+Event Type
+Severity
+Direction
+Protocol
+Remote host (6)
+Remote Port (25)
+Remote MAC
+Local Host (5)
+Local Port (26)
+Local MAC
+Application (15)
+Signature ID (21)
+Signature SubID (22)
+Signature Name (29)
+Intrusion-URL (30)
+X-Intrusion-Payload-URL
+User (19)
+User Domain (20)
+Location (18)
+Occurrences
+Beginning Time (10)
+End TIme (11)
+
+SHA-256 (34)
+Description (14)
+Symantec Version (31)
