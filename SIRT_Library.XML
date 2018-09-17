@@ -475,36 +475,37 @@ WHERE EventID=12</QueryData>
   <LPQuery>
     <QueryName>Sysmon: process create terminate</QueryName>
     <QueryDescription>Microsoft-Windows-Sysmon%4Operational.evtx (EventID 1,5) 
-Sysmon v7.01</QueryDescription>
-    <QueryData>Select ComputerName,SID, 
+Sysmon v8.0</QueryDescription>
+    <QueryData>Select ComputerName, SID,
 	CASE EventID When 1 Then 'Process Create' ELSE 'Process terminated' END AS TaskCategory,
-	extract_token(strings,0,'|') AS UtcTime,
-	extract_token(strings,1,'|') AS ProcGuid,
-	extract_token(strings,2,'|') AS ProcId,
-	extract_token(strings,3,'|') AS ImagePath,
-	extract_token(strings,4,'|') AS FileVersion,
-       extract_token(strings,5,'|') AS Description,
-       extract_token(strings,6,'|') AS Product,
-       extract_token(strings,7,'|') AS Company,
-       extract_token(strings,8,'|') AS CommandLine,
-	extract_token(strings,9,'|') AS CurrentDirectory,
-	extract_token(strings,10,'|') AS User,
-	extract_token(strings,11,'|') AS LogonGuid,
-	extract_token(strings,12,'|') AS LogonId,
-       extract_token(strings,13,'|') AS TerminalSessionId,
-	extract_token(strings,14,'|') AS IntegLvl,
-	extract_token(strings,15,'|') AS Hashs,
-	extract_token(strings,16,'|') AS ParProcGuid,
-	extract_token(strings,17,'|') AS ParProcId,
-	extract_token(strings,18,'|') AS ParImagePath,
-	extract_token(strings,19,'|') AS ParParams
-from '[LOGFILEPATH]'
+       extract_token(strings,0,'|') AS Rule,
+	extract_token(strings,1,'|') AS UtcTime,
+	extract_token(strings,2,'|') AS ProcGuid,
+	extract_token(strings,3,'|') AS ProcId,
+	extract_token(strings,4,'|') AS ImagePath,
+	extract_token(strings,5,'|') AS FileVersion,
+       extract_token(strings,6,'|') AS Description,
+       extract_token(strings,7,'|') AS Product,
+       extract_token(strings,8,'|') AS Company,
+       extract_token(strings,9,'|') AS CommandLine,
+	extract_token(strings,10,'|') AS CurrentDirectory,
+	extract_token(strings,11,'|') AS User,
+	extract_token(strings,12,'|') AS LogonGuid,
+	extract_token(strings,13,'|') AS LogonId,
+       extract_token(strings,14,'|') AS TerminalSessionId,
+	extract_token(strings,15,'|') AS IntegLvl,
+	extract_token(strings,16,'|') AS Hashs,
+	extract_token(strings,17,'|') AS ParProcGuid,
+	extract_token(strings,18,'|') AS ParProcId,
+	extract_token(strings,19,'|') AS ParImagePath,
+	extract_token(strings,20,'|') AS ParParams
+from '[LOGFILEPATH]' 
 where EventID in (1;5)</QueryData>
     <QueryID>4b3eaf26-e42d-47af-8632-6cecd92338b1</QueryID>
     <LogType>EVTLOG</LogType>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
-    <DateModified>2018-02-07T07:11:37.6780206-06:00</DateModified>
+    <DateModified>2018-09-13T09:37:15.6442004-05:00</DateModified>
   </LPQuery>
   <LPQuery>
     <QueryName>Sysmon: network socket count</QueryName>
@@ -854,26 +855,32 @@ ORDER BY Time(UTC) DESC</QueryData>
   <LPQuery>
     <QueryName>SEP: seclog.log</QueryName>
     <QueryDescription>Security log (IPS events mainly)</QueryDescription>
-    <QueryData>SELECT
-TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field2)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Time(UTC),
-STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),6,2))))))))) AS Remote_Host,
-HEX_TO_INT(Field25) AS Remote_Port,
-STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),6,2))))))))) AS Local_Host,
+    <QueryData>SELECT 
+TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field2)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Date_and_Time,
+REVERSEDNS(STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),6,2)))))))))) AS Remote_Host_Name,
+STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),6,2))))))))) AS Remote_Host_IP,
+HEX_TO_INT(TO_STRING(Field25)) AS Remote_Port,
+REVERSEDNS(STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),6,2)))))))))) AS Local_Host_Name,
+STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),6,2))))))))) AS Local_Host_IP,
 HEX_TO_INT(Field26) AS Local_Port,
 Field15 AS Application,
-Field14 AS Signature_ID,
-Field29 AS Signature_Name,
+HEX_TO_INT(Field21) AS Signature_ID,
+HEX_TO_INT(Field22) AS Signature_SubID, 
+Field30 AS Intrusion-URL,
 Field19 AS User,
 Field20 AS User_Domain,
 Field18 AS Location,
-TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field10)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Begin_Time(UTC),
-TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field11)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS End_Time(UTC)
+TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field11)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Beginning_Time,
+TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field10)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS End_Time,
+Field34 AS SHA-256,
+Field14 AS Description
+
 FROM '[LOGFILEPATH]'</QueryData>
     <QueryID>54c14d9a-813d-45b0-8c1f-031a89f55fa7</QueryID>
     <LogType>TSVLOG</LogType>
-    <QueryCategory>ALL</QueryCategory>
+    <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
-    <DateModified>2018-06-13T13:55:35.419519-05:00</DateModified>
+    <DateModified>2018-09-17T13:45:59.9477455-05:00</DateModified>
   </LPQuery>
   <LPQuery>
     <QueryName>SEP: Daily AV logs</QueryName>
