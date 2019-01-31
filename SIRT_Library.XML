@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ArrayOfLPQuery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <LPQuery>
+    <QueryName>WMI: wmiprvse execution</QueryName>
+    <QueryDescription>Microsoft-Windows-WMI-Activity%4Operational(EventID 5857)
+Indicates time of wmiprvse execution and path to provider dll.</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+EXTRACT_TOKEN(Strings, 0,'|') AS ProviderName,
+EXTRACT_TOKEN(Strings, 1,'|') AS Code,
+EXTRACT_TOKEN(Strings, 2,'|') AS HostProcess,
+EXTRACT_TOKEN(Strings, 3,'|') AS ProcessID,
+EXTRACT_TOKEN(Strings, 4,'|') AS ProviderPath
+FROM '[LOGFILEPATH]'
+WHERE EventID = 5857
+</QueryData>
+    <QueryID>7b8c75a7-9790-4eee-9931-6e22e3f4a492</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2018-10-02T07:38:31.0844877-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
     <QueryName>Windows Firewall: Rule was deleted (group by rulename)</QueryName>
     <QueryDescription>Microsoft-Windows-Windows Firewall With Advanced Security%4Firewall.evtx (EventID 2006)</QueryDescription>
     <QueryData>Select COUNT(*) as CNT,
@@ -832,6 +851,32 @@ FROM '[LOGFILEPATH]'</QueryData>
     <DateModified>2018-04-26T07:00:07.6612016-05:00</DateModified>
   </LPQuery>
   <LPQuery>
+    <QueryName>SEP: Tamper Protection Log</QueryName>
+    <QueryDescription>AVMan.log</QueryDescription>
+    <QueryData>SELECT
+EXTRACT_TOKEN(Field6,4,',') AS Computer,
+EXTRACT_TOKEN(Field6,5,',') AS User,
+CASE Field9 WHEN 55 THEN 'Process' ELSE
+    CASE Field9 WHEN 45 THEN 'File' ELSE
+        CASE Field9 WHEN 46 THEN 'Directory' ELSE
+            TO_STRING(Field9)
+        END
+    END
+END AS Object_Type,
+STRCAT(Field8,STRCAT(' (PID ',STRCAT(TO_STRING(Field7),')'))) AS Actor,
+STRCAT(Field12,STRCAT(' (PID ',STRCAT(TO_STRING(Field10),')'))) AS Target,
+STRCAT(Field11,STRCAT(' (PID ',STRCAT(TO_STRING(Field10),')'))) AS Target_Process,
+STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),2,2)),1)),STRCAT('/',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),4,2))),STRCAT('/',STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),0,2)),1970)),STRCAT(' ',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),6,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),6,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),6,2)))END,STRCAT(':',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),8,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),8,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),8,2)))END,STRCAT(':',CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),10,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),10,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),10,2)))END)))))))))) AS Time(UTC)
+FROM '[LOGFILEPATH]'
+WHERE EXTRACT_TOKEN(Field6,17,',') = '301'
+ORDER BY Time(UTC) DESC</QueryData>
+    <QueryID>3f48ce5f-dd2a-48f5-a2f9-87934aa6468e</QueryID>
+    <LogType>TSVLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2018-10-25T11:51:46.2094932-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
     <QueryName>SEP: syslog.log</QueryName>
     <QueryDescription>System log</QueryDescription>
     <QueryData>SELECT
@@ -1017,14 +1062,16 @@ CASE EXTRACT_TOKEN(Field6,11,',') WHEN '48' THEN 'Heuristic' ELSE
         END
     END
 END AS Virus_Type,
-EXTRACT_TOKEN(Field6,7,',') AS File
-FROM '\\localhost\C$\ProgramData\Symantec\Symantec Endpoint Protection\CurrentVersion\Data\Logs\AVMan.log'
+EXTRACT_TOKEN(Field6,7,',') AS File,
+Field22 AS Hash,
+EXTRACT_TOKEN(Field14,52,',') As Creator_For_Dropper
+FROM '[LOGFILEPATH]' 
 ORDER BY Time(UTC) DESC</QueryData>
     <QueryID>2fa3b1b8-9459-41fa-9897-b47c3cf74860</QueryID>
     <LogType>TSVLOG</LogType>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
-    <DateModified>2018-04-10T08:24:33.3223677-05:00</DateModified>
+    <DateModified>2019-01-31T12:33:21.9784191-06:00</DateModified>
   </LPQuery>
   <LPQuery>
     <QueryName>Security: User logoff</QueryName>
@@ -1669,18 +1716,65 @@ WHERE EventID = '1102'</QueryData>
 	extract_token(strings,5,'|') AS Type,
 	extract_token(strings,6,'|') AS ObjectName,
 	extract_token(strings,7,'|') AS HandleID,
-	extract_token(strings,8,'|') AS AccessList,
+	replace_str(
+           replace_str(
+               replace_str(
+                   replace_str(
+                       replace_str(
+                           replace_str(
+                               replace_str(
+                                   replace_str(
+                                       replace_str(
+                                           replace_str(
+                                               replace_str(
+                                                   replace_str(
+                                                       replace_str(
+                                                           replace_str(
+                                                               replace_str(
+                                                                   replace_str(
+                                                                       replace_str(
+                                                                           replace_str(
+                                                                               replace_str(
+                                                                                   replace_str(
+                                                                                       replace_str(
+                                                                                           replace_str(
+                                                                                               replace_str(
+                                                                                                   replace_str(extract_token(strings,8,'|'),
+                                                                                                   '%%1537', 'Delete, '),
+                                                                                               '%%1538','READ_CONTROL, '),
+                                                                                           '%%1539','WRITE_DAC, '),
+                                                                                       '%%1540','WRITE_OWNER, '),
+                                                                                   '%%1541','SYNCRONIZE'),
+                                                                               '%%1542','ACCESS_SYS_SEC, '),
+                                                                           '%%4416','ReadData, '),
+                                                                       '%%4417','WriteData, '),
+                                                                   '%%4418','AppendData, '),
+                                                               '%%4419','ReadEA, '),
+                                                           '%%4420','WriteEA, '),
+                                                       '%4422','DeleteChild'),
+                                                   '%%4421','Execute/Traverse, '),
+                                               '%%4423','ReadAttributes, '),
+                                           '%%4424','WriteAttributes, '),
+                                       '%%4432','Query Key Value, '),
+                                   '%%4433','Set Key Value, '),
+                               '%%4434','Create Sub Key, '),
+                           '%%4435','Enumerate sub-keys, '),
+                       '%%4436','Noitfy about changes to keys, '),
+                   '%%4437','Create Link, '),
+               '\u0009',''),
+           '\u000d',''),
+       '\u0010','') AS Access,
 	extract_token(strings,9,'|') AS AccessMask,
-	extract_token(strings,10,'|') AS ProcessID,
+	HEX_TO_INT(extract_token(strings,10,'|')) AS ProcessID,
 	extract_token(strings,11,'|') AS ProcessName,
 	extract_token(strings,12,'|') AS ResourceAttributes
-FROM '[LOGFILEPATH]'
+FROM '[LOGFILEPATH]' 
 WHERE EventID = 4663</QueryData>
     <QueryID>a01f8b3d-8408-4d8a-8c89-da37b97f26f8</QueryID>
     <LogType>EVTLOG</LogType>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
-    <DateModified>2017-06-20T13:13:27.740255-05:00</DateModified>
+    <DateModified>2018-10-08T14:27:32.785355-05:00</DateModified>
   </LPQuery>
   <LPQuery>
     <QueryName>Security: A registry value was modified</QueryName>
@@ -2017,5 +2111,42 @@ ORDER BY Path</QueryData>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
     <DateModified>2018-04-06T11:16:53.5649598-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>DriverFrameworks-UserMode:USB</QueryName>
+    <QueryDescription>Microsoft-Windows-DriverFrameworks-UserMode%4Operational.evtx</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date, ComputerName,
+CASE EventID WHEN 2003 THEN 'Connect' ELSE
+    'Disconnect'
+END AS Event,
+extract_token(extract_token(Strings,1,'&amp;'),1,'VEN_') as Vendor,
+extract_token(extract_token(Strings,2,'&amp;'),1,'PROD_') as Product,
+extract_token(extract_token(extract_token(Strings,3,'&amp;'),1,'REV_'),0,'#') as Version,
+extract_token(Strings,2,'#') as Serial_#,
+CASE strcnt(substr(extract_token(Strings,2,'#'),1,1), '&amp;') WHEN 1 THEN 'No' ELSE
+    'Yes'
+END AS Unique_Serial
+FROM '[LOGFILEPATH]'
+WHERE EventID=2003 OR (EventID=2100 AND Strings LIKE '%27|23%')
+ORDER BY Date DESC</QueryData>
+    <QueryID>e96bd70c-f08a-4d44-a533-6ff9b15c04f5</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2018-10-29T09:18:29.2046502-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Application: Msinstaller</QueryName>
+    <QueryDescription>Event 11707</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date,
+EXTRACT_TOKEN(Strings,0,'|') AS Description,
+RESOLVE_SID(SID) AS User 
+FROM '[LOGFILEPATH]'
+WHERE EventId = 11707</QueryData>
+    <QueryID>13e887e6-d869-4be5-8052-e5fe883ad390</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2018-10-03T13:06:14.1097063-05:00</DateModified>
   </LPQuery>
 </ArrayOfLPQuery>
