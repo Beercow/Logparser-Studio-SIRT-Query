@@ -851,73 +851,34 @@ FROM '[LOGFILEPATH]'</QueryData>
     <DateModified>2018-04-26T07:00:07.6612016-05:00</DateModified>
   </LPQuery>
   <LPQuery>
-    <QueryName>SEP: Tamper Protection Log</QueryName>
-    <QueryDescription>AVMan.log</QueryDescription>
-    <QueryData>SELECT
-EXTRACT_TOKEN(Field6,4,',') AS Computer,
-EXTRACT_TOKEN(Field6,5,',') AS User,
-CASE Field9 WHEN 55 THEN 'Process' ELSE
-    CASE Field9 WHEN 45 THEN 'File' ELSE
-        CASE Field9 WHEN 46 THEN 'Directory' ELSE
-            TO_STRING(Field9)
-        END
-    END
-END AS Object_Type,
-STRCAT(Field8,STRCAT(' (PID ',STRCAT(TO_STRING(Field7),')'))) AS Actor,
-STRCAT(Field12,STRCAT(' (PID ',STRCAT(TO_STRING(Field10),')'))) AS Target,
-STRCAT(Field11,STRCAT(' (PID ',STRCAT(TO_STRING(Field10),')'))) AS Target_Process,
-STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),2,2)),1)),STRCAT('/',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),4,2))),STRCAT('/',STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),0,2)),1970)),STRCAT(' ',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),6,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),6,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),6,2)))END,STRCAT(':',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),8,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),8,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),8,2)))END,STRCAT(':',CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),10,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),10,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field6,0,','),10,2)))END)))))))))) AS Time(UTC)
-FROM '[LOGFILEPATH]'
-WHERE EXTRACT_TOKEN(Field6,17,',') = '301'
-ORDER BY Time(UTC) DESC</QueryData>
-    <QueryID>3f48ce5f-dd2a-48f5-a2f9-87934aa6468e</QueryID>
-    <LogType>TSVLOG</LogType>
-    <QueryCategory>FAV</QueryCategory>
-    <IsFavorite>true</IsFavorite>
-    <DateModified>2018-10-25T11:51:46.2094932-05:00</DateModified>
-  </LPQuery>
-  <LPQuery>
-    <QueryName>SEP: syslog.log</QueryName>
-    <QueryDescription>System log</QueryDescription>
-    <QueryData>SELECT
-TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field2)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Time(UTC),
-CASE Field5 WHEN 0 THEN 'Information' ELSE 
-    CASE Field5 WHEN 1 THEN 'Warning' ELSE 
-        TO_STRING(Field5)
-    END
-END AS Severity,
-Field7 AS Summary,
-Field8 AS Description
-FROM '\\localhost\C$\ProgramData\Symantec\Symantec Endpoint Protection\CurrentVersion\Data\Logs\syslog.log'
-WHERE Field3 IS NOT NULL
-ORDER BY Time(UTC) DESC</QueryData>
-    <QueryID>588dc2a3-e17d-4a79-b9cb-2fc1e49b6296</QueryID>
-    <LogType>TSVLOG</LogType>
-    <QueryCategory>FAV</QueryCategory>
-    <IsFavorite>true</IsFavorite>
-    <DateModified>2018-04-10T08:06:09.6495987-05:00</DateModified>
-  </LPQuery>
-  <LPQuery>
     <QueryName>SEP: seclog.log</QueryName>
     <QueryDescription>Security log (IPS events mainly)</QueryDescription>
-    <QueryData>SELECT 
+    <QueryData>/* nFields 39 */
+SELECT 
 TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field2)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Date_and_Time,
+CASE Field4 WHEN '00000003' THEN 'Critical'
+    WHEN '00000007' THEN 'Major' ELSE
+        Field4 END AS Severity,
+CASE Field9 WHEN '00000002' THEN 'Outgoing' 
+    WHEN '00000001' THEN 'Incoming' END AS Direction,
 REVERSEDNS(STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),6,2)))))))))) AS Remote_Host_Name,
 STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field6),6,2))))))))) AS Remote_Host_IP,
-HEX_TO_INT(TO_STRING(Field25)) AS Remote_Port,
+HEX_TO_INT(TO_STRING(Field27)) AS Remote_Port,
 REVERSEDNS(STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),6,2)))))))))) AS Local_Host_Name,
 STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field5),6,2))))))))) AS Local_Host_IP,
-HEX_TO_INT(Field26) AS Local_Port,
-Field15 AS Application,
-HEX_TO_INT(Field21) AS Signature_ID,
-HEX_TO_INT(Field22) AS Signature_SubID, 
-Field30 AS Intrusion-URL,
-Field19 AS User,
-Field20 AS User_Domain,
-Field18 AS Location,
+HEX_TO_INT(Field28) AS Local_Port,
+Field16 AS Application,
+HEX_TO_INT(Field23) AS Signature_ID,
+HEX_TO_INT(Field24) AS Signature_SubID,
+Field31 AS Signature_Name, 
+Field32 AS Intrusion-URL,
+Field21 AS User,
+Field22 AS User_Domain,
+Field20 AS Location,
+TO_INT(Field12) AS Occurrences,
 TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field11)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS Beginning_Time,
 TO_TIMESTAMP(ADD(DIV(TO_REAL(HEX_TO_INT(Field10)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1601','yyyy')))) AS End_Time,
-Field34 AS SHA-256,
+Field39 AS SHA-256,
 Field14 AS Description
 
 FROM '[LOGFILEPATH]'</QueryData>
@@ -925,71 +886,1283 @@ FROM '[LOGFILEPATH]'</QueryData>
     <LogType>TSVLOG</LogType>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
-    <DateModified>2018-09-17T13:45:59.9477455-05:00</DateModified>
+    <DateModified>2019-05-03T12:47:31.5531327-05:00</DateModified>
   </LPQuery>
   <LPQuery>
     <QueryName>SEP: Daily AV logs</QueryName>
     <QueryDescription>C:\ProgramData\Symantec\Symantec Endpoint Protection\CurrentVersion\Data\Logs\AV</QueryDescription>
-    <QueryData>SELECT
-STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(Field1,2,2)),1)),STRCAT('/',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(Field1,4,2))),STRCAT('/',STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(Field1,0,2)),1970)),STRCAT(' ',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(Field1,6,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(Field1,6,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(Field1,6,2)))END,STRCAT(':',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(Field1,8,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(Field1,8,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(Field1,8,2)))END,STRCAT(':',CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(Field1,10,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(Field1,10,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(Field1,10,2)))END)))))))))) AS Time(UTC),
-Field5 AS Computer,
-Field6 AS User,
-CASE TO_STRING(Field11) WHEN '1' THEN 'Quarantine' ELSE 
-    CASE TO_STRING(Field11) WHEN '2' Then 'Rename' ELSE
-        CASE TO_STRING(Field11) WHEN '3' Then 'Delete' ELSE
-            CASE TO_STRING(Field11) WHEN '4' Then 'Leave Alone' ELSE
-                CASE TO_STRING(Field11) WHEN '5' Then 'Clean' ELSE
-                    CASE TO_STRING(Field11) WHEN '6' Then 'Remove Macros' ELSE
-                        CASE TO_STRING(Field11) WHEN '7' Then 'Save file as...' ELSE
-                            CASE TO_STRING(Field11) WHEN '8' Then 'Sent to backend' ELSE
-                                CASE TO_STRING(Field11) WHEN '9' Then 'Restore from Quarantine' ELSE
-                                    CASE TO_STRING(Field11) WHEN '10' Then 'Rename Back (unused)' ELSE
-                                        CASE TO_STRING(Field11) WHEN '11' Then 'Undo Action' ELSE
-                                            CASE TO_STRING(Field11) WHEN '12' Then 'Error' ELSE
-                                                CASE TO_STRING(Field11) WHEN '13' Then 'Backup to quarantine (backup view)' ELSE
-                                                    CASE TO_STRING(Field11) WHEN '14' Then 'Pending Analysis' ELSE
-                                                        CASE TO_STRING(Field11) WHEN '15' Then 'Partially Fixed' ELSE
-                                                            CASE TO_STRING(Field11) WHEN '16' Then 'Terminate Process Required' ELSE
-                                                                CASE TO_STRING(Field11) WHEN '17' Then 'Exclude from Scanning' ELSE
-                                                                    CASE TO_STRING(Field11) WHEN '18' Then 'Reboot Processing' ELSE
-                                                                        CASE TO_STRING(Field11) WHEN '19' Then 'Clean by Deletion' ELSE
-                                                                            CASE TO_STRING(Field11) WHEN '20' Then 'Access Denied' ELSE
-                                                                                TO_STRING(Field11)
-                                                                            END
-                                                                        END
-                                                                    END
-                                                                END
-                                                            END
-                                                        END
-                                                    END
-                                                END
-                                            END
-                                        END
-                                    END
-                                END
-                            END
-                        END
-                    END
-                END
-            END
-        END
-    END
+    <QueryData>SELECT Index,
+STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),2,2)),1)),STRCAT('/',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),4,2))),STRCAT('/',STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),0,2)),1970)),STRCAT(' ',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),6,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),6,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),6,2)))END,STRCAT(':',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),8,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),8,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),8,2)))END,STRCAT(':',CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),10,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),10,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Text,0,','),10,2)))END)))))))))) AS Time(UTC),
+EXTRACT_TOKEN(Text,4,',') AS Computer,
+EXTRACT_TOKEN(Text,5,',') AS User,
+CASE TO_STRING(EXTRACT_TOKEN(Text,10,',')) WHEN '1' THEN 'Quarantine' 
+    WHEN '2' Then 'Rename'
+        WHEN '3' Then 'Delete'
+            WHEN '4' Then 'Leave Alone'
+                WHEN '5' Then 'Clean'
+                    WHEN '6' Then 'Remove Macros'
+                        WHEN '7' Then 'Save file as...'
+                            WHEN '8' Then 'Sent to backend'
+                                WHEN '9' Then 'Restore from Quarantine'
+                                    WHEN '10' Then 'Rename Back (unused)'
+                                        WHEN '11' Then 'Undo Action'
+                                            WHEN '12' Then 'Error'
+                                                WHEN '13' Then 'Backup to quarantine (backup view)'
+                                                    WHEN '14' Then 'Pending Analysis'
+                                                        WHEN '15' Then 'Partially Fixed'
+                                                            WHEN '16' Then 'Terminate Process Required'
+                                                                WHEN '17' Then 'Exclude from Scanning'
+                                                                    WHEN '18' Then 'Reboot Processing'
+                                                                        WHEN '19' Then 'Clean by Deletion'
+                                                                            WHEN '20' Then 'Access Denied' ELSE
+                                                                                TO_STRING(EXTRACT_TOKEN(Text,10,','))
 END AS Action,
-Field14 AS Description,
-Field18 AS Event_Data,
-Field7 AS Virus,
-Field8 AS File,
-Field70 AS Creator_For_Dropper,
-Field37 AS Domain,
-Field38 AS MAC
-FROM '\\localhost\C$\ProgramData\Symantec\Symantec Endpoint Protection\CurrentVersion\Data\Logs\AV\*.log'
-WHERE File IS NOT NULL
+EXTRACT_TOKEN(Text,13,',') AS Description,
+EXTRACT_TOKEN(Text,6,',') AS Virus,
+EXTRACT_TOKEN(Text,7,',') AS File,
+EXTRACT_TOKEN(REPLACE_CHR(EXTRACT_TOKEN(Text,59,','),'\u0009',','),4,',') AS HASH,
+EXTRACT_TOKEN(Text,69,',') AS Creator_For_Dropper,
+EXTRACT_TOKEN(Text,36,',') AS Domain,
+EXTRACT_TOKEN(Text,37,',') AS MAC
+FROM '[LOGFILEPATH]' 
+WHERE STRLEN(File) NOT IN (0)
 ORDER BY Time(UTC) DESC</QueryData>
     <QueryID>e7977171-79c1-4ec9-889a-3a68f46bad2c</QueryID>
-    <LogType>CSVLOG</LogType>
+    <LogType>TEXTLINELOG</LogType>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
-    <DateModified>2018-04-11T12:45:37.6598624-05:00</DateModified>
+    <DateModified>2019-04-18T11:15:33.9176881-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>SEP: Client Management (Tamper Protect)</QueryName>
+    <QueryDescription>C:\Users\&lt;user_name&gt;\AppData\Local\Symantec\Symantec Endpoint Protection\Logs\*.Log
+
+C:\ProgramData\Symantec\Symantec Endpoint Protection\CurrentVersion\Data\Logs\AV\*.Log</QueryDescription>
+    <QueryData>SELECT LogFilename,
+CASE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') WHEN '301' THEN EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),9,',')
+    ELSE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),4,',')
+END AS Computer,
+CASE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') WHEN '301' THEN EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),10,',')
+    ELSE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,',')
+END AS User,
+CASE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') WHEN '301' THEN STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),24,','),STRCAT(' (PID ',STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),23,','),')')))
+    ELSE STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),19,','),STRCAT(' (PID ',STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),18,','),')')))
+END AS Actor,
+CASE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') WHEN '301' THEN EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),28,',')
+    ELSE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),13,',')
+END AS Target,
+CASE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') WHEN '301' THEN STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),27,','),STRCAT(' (PID ',STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),26,','),')')))
+    ELSE STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,','),STRCAT(' (PID ',STRCAT(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),21,','),')')))
+END AS Target_Process,
+CASE EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') WHEN '301' THEN STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),2,2)),1)),STRCAT('/',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),4,2))),STRCAT('/',STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),0,2)),1970)),STRCAT(' ',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),6,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),6,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),6,2)))END,STRCAT(':',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),8,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),8,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),8,2)))END,STRCAT(':',CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),10,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),10,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),5,','),0,','),10,2)))END))))))))))
+    ELSE STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),2,2)),1)),STRCAT('/',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),4,2))),STRCAT('/',STRCAT(TO_STRING(ADD(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),0,2)),1970)),STRCAT(' ',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),6,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),6,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),6,2)))END,STRCAT(':',STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),8,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),8,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),8,2)))END,STRCAT(':',CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),10,2)))) WHEN 1 THEN STRCAT('0',TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),10,2)))) ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),0,','),0,','),10,2)))END))))))))))
+END AS Time(UTC)
+FROM '[LOGFILEPATH]'
+WHERE (Index &gt; 1 AND EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),22,',') = '301' AND LogFilename LIKE '%AVMan.log') OR (EXTRACT_TOKEN(REPLACE_CHR(Text,'\u0009',','),17,',') = '301' AND LogFilename NOT LIKE '%AVMan.log')
+</QueryData>
+    <QueryID>724a9cb8-5ced-41f8-b600-ce4e65cb0cf5</QueryID>
+    <LogType>TEXTLINELOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-04-04T10:09:32.4538182-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>SEP: Client Management (System)</QueryName>
+    <QueryDescription>syslog.log</QueryDescription>
+    <QueryData>/* -headerRow:off -nSkiplines:1 -nFields:9 */
+SELECT FileName,
+	CASE Field2
+		WHEN 'CVE'
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE TO_STRING(TO_TIMESTAMP(ADD (
+						DIV(SUB(TO_REAL(HEX_TO_INT(Field2)), TO_REAL(116444736000000000)), TO_REAL(10000000))
+						,TO_REAL(TIMESTAMP (
+								'1970'
+								,'yyyy'
+								))
+						)), 'M/d/yyyy HH:mm:ss')
+		END AS DateAndTime,
+	CASE TO_STRING(Field5)
+		WHEN '00000000'
+			THEN 'Information'
+		WHEN '00000001'
+			THEN 'Warning'
+		WHEN '00000002'
+			THEN 'Error'
+		ELSE ''
+		END AS Severity,
+	CASE Field2
+		WHEN 'CVE'
+			THEN Field1
+		WHEN 'SYLINK'
+			THEN Field1
+		WHEN 'Smc'
+			THEN Field1
+		WHEN NULL
+			THEN Field1
+		ELSE Field7
+		END AS Summary,
+	CASE Field2
+		WHEN 'CVE'
+			THEN Field2
+		WHEN 'SYLINK'
+			THEN Field2
+		WHEN 'Smc'
+			THEN Field2
+		WHEN NULL
+			THEN Field2
+		ELSE Field8 
+		END AS Type,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN HEX_TO_INT(SUBSTR(Field9, 2, 8))
+		END AS Size_(bytes),
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE STRCAT(TO_STRING(ADD (
+						HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 2, 2))
+						,1
+						)), STRCAT('/', STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 4, 2))), STRCAT('/', STRCAT(TO_STRING(ADD (
+										HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 0, 2))
+										,1970
+										)), STRCAT(' ', STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 6, 2))))
+											WHEN 1
+												THEN STRCAT('0', TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 6, 2))))
+											ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 6, 2)))
+											END, STRCAT(':', STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 8, 2))))
+													WHEN 1
+														THEN STRCAT('0', TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 8, 2))))
+													ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 8, 2)))
+													END, STRCAT(':', CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 10, 2))))
+														WHEN 1
+															THEN STRCAT('0', TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 10, 2))))
+														ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 0, ','), 10, 2)))
+														END))))))))))
+		END AS LOG:Time(UTC),
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 1, ',')
+				WHEN '1'
+					THEN 'IS_ALERT'
+				WHEN '2'
+					THEN 'SCAN_STOP'
+				WHEN '3'
+					THEN 'SCAN_START'
+				WHEN '4'
+					THEN 'PATTERN_UPDATE'
+				WHEN '5'
+					THEN 'INFECTION'
+				WHEN '6'
+					THEN 'FILE_NOTOPEN'
+				WHEN '7'
+					THEN 'LOAD_PATTERN'
+				WHEN '8'
+					THEN 'MESSAGE_INFO'
+				WHEN '9'
+					THEN 'MESSAGE_ERROR'
+				WHEN '10'
+					THEN 'CHECKSUM'
+				WHEN '11'
+					THEN 'TRAP'
+				WHEN '12'
+					THEN 'CONFIG_CHANGE'
+				WHEN '13'
+					THEN 'SHUTDOWN'
+				WHEN '14'
+					THEN 'STARTUP'
+				WHEN '16'
+					THEN 'PATTERN_DOWNLOAD'
+				WHEN '17'
+					THEN 'TOO_MANY_VIRUSES'
+				WHEN '18'
+					THEN 'FWD_TO_QSERVER'
+				WHEN '19'
+					THEN 'SCANDLVR'
+				WHEN '20'
+					THEN 'BACKUP'
+				WHEN '21'
+					THEN 'SCAN_ABORT'
+				WHEN '22'
+					THEN 'RTS_LOAD_ERROR'
+				WHEN '23'
+					THEN 'RTS_LOAD'
+				WHEN '24'
+					THEN 'RTS_UNLOAD'
+				WHEN '25'
+					THEN 'REMOVE_CLIENT'
+				WHEN '26'
+					THEN 'SCAN_DELAYED'
+				WHEN '27'
+					THEN 'SCAN_RESTART'
+				WHEN '28'
+					THEN 'ADD_SAVROAMCLIENT_TOSERVER'
+				WHEN '29'
+					THEN 'REMOVE_SAVROAMCLIENT_FROMSERVER'
+				WHEN '30'
+					THEN 'LICENSE_WARNING'
+				WHEN '31'
+					THEN 'LICENSE_ERROR'
+				WHEN '32'
+					THEN 'LICENSE_GRACE'
+				WHEN '33'
+					THEN 'UNAUTHORIZED_COMM'
+				WHEN '34'
+					THEN 'LOG:FWD_THRD_ERR'
+				WHEN '35'
+					THEN 'LICENSE_INSTALLED'
+				WHEN '36'
+					THEN 'LICENSE_ALLOCATED'
+				WHEN '37'
+					THEN 'LICENSE_OK'
+				WHEN '38'
+					THEN 'LICENSE_DEALLOCATED'
+				WHEN '39'
+					THEN 'BAD_DEFS_ROLLBACK'
+				WHEN '40'
+					THEN 'BAD_DEFS_UNPROTECTED'
+				WHEN '41'
+					THEN 'SAV_PROVIDER_PARSING_ERROR'
+				WHEN '42'
+					THEN 'RTS_ERROR'
+				WHEN '43'
+					THEN 'COMPLIANCE_FAIL'
+				WHEN '44'
+					THEN 'COMPLIANCE_SUCCESS'
+				WHEN '45'
+					THEN 'SECURITY_SYMPROTECT_POLICYVIOLATION'
+				WHEN '46'
+					THEN 'ANOMALY_START'
+				WHEN '47'
+					THEN 'DETECTIOM_ACTION_TAKEN'
+				WHEN '48'
+					THEN 'REMEDIATION_ACTION_PENDING'
+				WHEN '49'
+					THEN 'REMEDIATION_ACTION_FAILED'
+				WHEN '50'
+					THEN 'REMEDIATION_ACTION_SUCCESSFUL'
+				WHEN '51'
+					THEN 'ANOMALY_FINISH'
+				WHEN '52'
+					THEN 'COMMS_LOGIN_FAILED'
+				WHEN '53'
+					THEN 'COMMS_LOGIN_SUCCESS'
+				WHEN '54'
+					THEN 'COMMS_UNAUTHORIZED_COMM'
+				WHEN '55'
+					THEN 'CLIENT_INSTALL_AV'
+				WHEN '56'
+					THEN 'CLIENT_INSTALL_FW'
+				WHEN '57'
+					THEN 'CLIENT_UNINSTALL'
+				WHEN '58'
+					THEN 'CLIENT_UNINSTALL_ROLLBACK'
+				WHEN '59'
+					THEN 'COMMS_SERVER_GROUP_ROOT_CERT_ISSUE'
+				WHEN '60'
+					THEN 'COMMS_SERVER_CERT_ISSUE'
+				WHEN '61'
+					THEN 'COMMS_TRUSTED_ROOT_CHANGE'
+				WHEN '62'
+					THEN 'OMMS_SERVER_CERT_STARTUP_FAILED'
+				WHEN '63'
+					THEN 'CLIENT_CHECKIN'
+				WHEN '64'
+					THEN 'CLIENT_NO_CHECKIN'
+				WHEN '65'
+					THEN 'SCAN_SUSPENDED'
+				WHEN '66'
+					THEN 'SCAN RESUMED'
+				WHEN '67'
+					THEN 'SCAN_DURATION_INSUFFICIENT'
+				WHEN '68'
+					THEN 'CLIENT_MOVE'
+				WHEN '69'
+					THEN 'SCAN_FAILED_ENHANCED'
+				WHEN '70'
+					THEN 'COMPLIANCE_FAILEDAUDIT'
+				WHEN '71'
+					THEN 'HEUR_THREAT_NOW_WHITELISTED'
+				WHEN '72'
+					THEN 'INTERESTING_PROCESS_DETECTED_START'
+				WHEN '73'
+					THEN 'LOAD_ERROR_BASH'
+				WHEN '74'
+					THEN 'LOAD_ERROR_BASH_DEFINITIONS'
+				WHEN '75'
+					THEN 'INTERESTING_PROCESS_DETECTED_FINISH'
+				WHEN '76'
+					THEN 'BASH_NOT_SUPPORTED_FOR_OS'
+				WHEN '77'
+					THEN 'HEUR_THREAT_NOW_KNOWN'
+				WHEN '78'
+					THEN 'DISABLE_BASH'
+				WHEN '79'
+					THEN 'ENABLE_BASH'
+				WHEN '80'
+					THEN 'DEFS_LOAD_FAILED'
+				WHEN '81'
+					THEN 'LOCALREP_CACHE_SERVER_ERROR'
+				WHEN '82'
+					THEN 'REPUTATION_CHECK_TIMEOUT'
+				WHEN '83'
+					THEN 'SYMEPSECFILTER_DRIVER_ERROR'
+				WHEN '84'
+					THEN 'VSIC_COMMUNICATION_WARNING'
+				WHEN '85'
+					THEN 'VSIC_COMMUNICATION_RESTORED'
+				WHEN '86'
+					THEN 'ELAM_LOAD_FAILED'
+				WHEN '87'
+					THEN 'ELAM_INVALID_OS'
+				WHEN '88'
+					THEN 'ELAM_ENABLE'
+				WHEN '89'
+					THEN 'ELAM_DISABLE'
+				WHEN '90'
+					THEN 'ELAM_BAD'
+				WHEN '91'
+					THEN 'ELAM_BAD_REPORTED_AS_UNKNOWN'
+				WHEN '92'
+					THEN 'DISABLE_SYMPROTECT'
+				WHEN '93'
+					THEN 'ENABLE_SYMPROTECT'
+				WHEN '94'
+					THEN 'NETSEC_EOC_PARSE_FAILED'
+				ELSE EXTRACT_TOKEN(Field9, 1, ',')
+				END
+		END AS LOG:Event,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 2, ',')
+				WHEN '1'
+					THEN 'Infection'
+				WHEN '2'
+					THEN 'Summary'
+				WHEN '3'
+					THEN 'Pattern'
+				WHEN '4'
+					THEN 'Security'
+				ELSE EXTRACT_TOKEN(Field9, 2, ',')
+				END
+		END AS LOG:Category,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 3, ',')
+				WHEN '0'
+					THEN 'Scheduled'
+				WHEN '1'
+					THEN 'Manual'
+				WHEN '2'
+					THEN 'Real_Time'
+				WHEN '3'
+					THEN 'Integrity_Shield'
+				WHEN '6'
+					THEN 'Console'
+				WHEN '7'
+					THEN 'VPDOWN'
+				WHEN '8'
+					THEN 'System'
+				WHEN '9'
+					THEN 'Startup'
+				WHEN '10'
+					THEN 'Idle'
+				WHEN '11'
+					THEN 'DefWatch'
+				WHEN '12'
+					THEN 'Licensing'
+				WHEN '13'
+					THEN 'Manual_Quarantine'
+				WHEN '14'
+					THEN 'SymProtect'
+				WHEN '15'
+					THEN 'Reboot_Processing'
+				WHEN '16'
+					THEN 'Bash'
+				WHEN '17'
+					THEN 'SymElam'
+				WHEN '18'
+					THEN 'PowerEraser'
+				WHEN '19'
+					THEN 'EOCScan'
+				WHEN '100'
+					THEN 'LOCAL_END'
+				WHEN '101'
+					THEN 'Client'
+				WHEN '102'
+					THEN 'Forewarded'
+				WHEN '256'
+					THEN 'Transport_Client'
+				ELSE EXTRACT_TOKEN(Field9, 3, ',')
+				END
+		END AS LOG:Logger,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 4, ',')
+		END AS LOG:Computer,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 5, ',')
+		END AS LOG:User,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 6, ',')
+		END AS LOG:Virus,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 7, ',')
+		END AS LOG:File,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 8, ',')
+				WHEN '4294967295#'
+					THEN 'Invalid'
+				WHEN '1'
+					THEN 'Quarantine'
+				WHEN '2'
+					THEN 'Rename'
+				WHEN '3'
+					THEN 'Delete'
+				WHEN '4'
+					THEN 'Leave Alone'
+				WHEN '5'
+					THEN 'Clean'
+				WHEN '6'
+					THEN 'Remove Macros'
+				WHEN '7'
+					THEN 'Save file as...'
+				WHEN '8'
+					THEN 'Send to backend'
+				WHEN '9'
+					THEN 'Restore from Quarantine'
+				WHEN '10'
+					THEN 'Rename Back (unused)'
+				WHEN '11'
+					THEN 'Undo Action'
+				WHEN '12'
+					THEN 'Error'
+				WHEN '13'
+					THEN 'Backup to quarantine (backup view)'
+				WHEN '14'
+					THEN 'Pending Analysis'
+				WHEN '16'
+					THEN 'Terminate Process Required'
+				WHEN '17'
+					THEN 'Exclude from Scanning'
+				WHEN '18'
+					THEN 'Reboot Processing'
+				WHEN '19'
+					THEN 'Clean by Deletion'
+				WHEN '20'
+					THEN 'Access Denied'
+				WHEN '21'
+					THEN 'TERMINATE PROCESS ONLY'
+				WHEN '22'
+					THEN 'NO REPAIR'
+				WHEN '23'
+					THEN 'FAIL'
+				WHEN '24'
+					THEN 'RUN POWERTOOL'
+				WHEN '25'
+					THEN 'NO REPAIR POWERTOOL'
+				WHEN '110'
+					THEN 'INTERESTING PROCESS CAL'
+				WHEN '111'
+					THEN 'INTERESTING PROCESS DETECTED'
+				WHEN '1000'
+					THEN 'INTERESTING PROCESS HASHED DETECTED'
+				WHEN '1001'
+					THEN 'DNS HOST FILE EXCEPTOION'
+				ELSE EXTRACT_TOKEN(Field9, 8, ',')
+				END
+		END AS LOG:WantedAction1,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 9, ',')
+				WHEN '4294967295#'
+					THEN 'Invalid'
+				WHEN '1'
+					THEN 'Quarantine'
+				WHEN '2'
+					THEN 'Rename'
+				WHEN '3'
+					THEN 'Delete'
+				WHEN '4'
+					THEN 'Leave Alone'
+				WHEN '5'
+					THEN 'Clean'
+				WHEN '6'
+					THEN 'Remove Macros'
+				WHEN '7'
+					THEN 'Save file as...'
+				WHEN '8'
+					THEN 'Send to backend'
+				WHEN '9'
+					THEN 'Restore from Quarantine'
+				WHEN '10'
+					THEN 'Rename Back (unused)'
+				WHEN '11'
+					THEN 'Undo Action'
+				WHEN '12'
+					THEN 'Error'
+				WHEN '13'
+					THEN 'Backup to quarantine (backup view)'
+				WHEN '14'
+					THEN 'Pending Analysis'
+				WHEN '16'
+					THEN 'Terminate Process Required'
+				WHEN '17'
+					THEN 'Exclude from Scanning'
+				WHEN '18'
+					THEN 'Reboot Processing'
+				WHEN '19'
+					THEN 'Clean by Deletion'
+				WHEN '20'
+					THEN 'Access Denied'
+				WHEN '21'
+					THEN 'TERMINATE PROCESS ONLY'
+				WHEN '22'
+					THEN 'NO REPAIR'
+				WHEN '23'
+					THEN 'FAIL'
+				WHEN '24'
+					THEN 'RUN POWERTOOL'
+				WHEN '25'
+					THEN 'NO REPAIR POWERTOOL'
+				WHEN '110'
+					THEN 'INTERESTING PROCESS CAL'
+				WHEN '111'
+					THEN 'INTERESTING PROCESS DETECTED'
+				WHEN '1000'
+					THEN 'INTERESTING PROCESS HASHED DETECTED'
+				WHEN '1001'
+					THEN 'DNS HOST FILE EXCEPTOION'
+				ELSE EXTRACT_TOKEN(Field9, 9, ',')
+				END
+		END AS LOG:WantedAction2,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 10, ',')
+				WHEN '4294967295#'
+					THEN 'Invalid'
+				WHEN '1'
+					THEN 'Quarantine'
+				WHEN '2'
+					THEN 'Rename'
+				WHEN '3'
+					THEN 'Delete'
+				WHEN '4'
+					THEN 'Leave Alone'
+				WHEN '5'
+					THEN 'Clean'
+				WHEN '6'
+					THEN 'Remove Macros'
+				WHEN '7'
+					THEN 'Save file as...'
+				WHEN '8'
+					THEN 'Send to backend'
+				WHEN '9'
+					THEN 'Restore from Quarantine'
+				WHEN '10'
+					THEN 'Rename Back (unused)'
+				WHEN '11'
+					THEN 'Undo Action'
+				WHEN '12'
+					THEN 'Error'
+				WHEN '13'
+					THEN 'Backup to quarantine (backup view)'
+				WHEN '14'
+					THEN 'Pending Analysis'
+				WHEN '16'
+					THEN 'Terminate Process Required'
+				WHEN '17'
+					THEN 'Exclude from Scanning'
+				WHEN '18'
+					THEN 'Reboot Processing'
+				WHEN '19'
+					THEN 'Clean by Deletion'
+				WHEN '20'
+					THEN 'Access Denied'
+				WHEN '21'
+					THEN 'TERMINATE PROCESS ONLY'
+				WHEN '22'
+					THEN 'NO REPAIR'
+				WHEN '23'
+					THEN 'FAIL'
+				WHEN '24'
+					THEN 'RUN POWERTOOL'
+				WHEN '25'
+					THEN 'NO REPAIR POWERTOOL'
+				WHEN '110'
+					THEN 'INTERESTING PROCESS CAL'
+				WHEN '111'
+					THEN 'INTERESTING PROCESS DETECTED'
+				WHEN '1000'
+					THEN 'INTERESTING PROCESS HASHED DETECTED'
+				WHEN '1001'
+					THEN 'DNS HOST FILE EXCEPTOION'
+				ELSE EXTRACT_TOKEN(Field9, 10, ',')
+				END
+		END AS LOG:RealAction,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 11, ',')
+				WHEN '48'
+					THEN 'Heuristic'
+				WHEN '64'
+					THEN 'Reputation'
+				WHEN '80'
+					THEN 'Hack Tools'
+				WHEN '96'
+					THEN 'Spyware'
+				WHEN '112'
+					THEN 'Trackware'
+				WHEN '128'
+					THEN 'Dialers'
+				WHEN '144'
+					THEN 'Remote Access'
+				WHEN '160'
+					THEN 'Adware'
+				WHEN '176'
+					THEN 'Joke Programs'
+				WHEN '224'
+					THEN 'Heuristic Application'
+				ELSE EXTRACT_TOKEN(Field9, 11, ',')
+				END
+		END AS LOG:Virus_Type,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 12, ',')
+		END AS LOG:Flags,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 13, ',')
+		END AS LOG:Description,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 14, ',')
+		END AS LOG:ScanID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 15, ',')
+		END AS LOG:New_Ext,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 16, ',')
+		END AS LOG:Group_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 17, ',')
+		END AS LOG:Event_Data,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 18, ',')
+		END AS LOG:VBin_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 19, ',')
+		END AS LOG:Virus_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 20, ',')
+		END AS LOG:Quarantine_Forward_Status,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 21, ',')
+		END AS LOG:Access,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 22, ',')
+		END AS LOG:SDN_Status,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 23, ',')
+		END AS LOG:Compressed,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 24, ',')
+		END AS LOG:Depth,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 25, ',')
+		END AS LOG:Still_Infected,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 26, ',')
+		END AS LOG:Def_Info,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 27, ',')
+		END AS LOG:Def_Sequence_Number,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 28, ',')
+		END AS LOG:Clean_Info,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 29, ',')
+		END AS LOG:Delete_Info,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 30, ',')
+		END AS LOG:Backup_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 31, ',')
+		END AS LOG:Parent,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 32, ',')
+		END AS LOG:GUID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 33, ',')
+		END AS LOG:Client_Group,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 34, ',')
+		END AS LOG:Address,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 35, ',')
+		END AS LOG:Domain_Name,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 36, ',')
+		END AS LOG:NT_Domain,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 37, ',')
+		END AS LOG:MAC_Address,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 38, ',')
+		END AS LOG:Version,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 39, ',')
+		END AS LOG:Remote_Machine,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 40, ',')
+		END AS LOG:Remote_Machine_IP,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 41, ',')
+		END AS LOG:Action_1_Status,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 42, ',')
+		END AS LOG:Action_2_Status,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 43, ',')
+		END AS LOG:License_Feature_Name,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 44, ',')
+		END AS LOG:License_Feature_Version,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 45, ',')
+		END AS LOG:License_Serial_Number,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 46, ',')
+		END AS LOG:License_Fulfillment_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 47, ',')
+		END AS LOG:License_Start_Date,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 48, ',')
+		END AS LOG:License_Expiration_Date,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 49, ',')
+		END AS LOG:License_LifeCycle,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 50, ',')
+		END AS LOG:License_Seats_Total,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 51, ',')
+		END AS LOG:License_Seats,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 52, ',')
+		END AS LOG:Error_Code,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 53, ',')
+		END AS LOG:License_Seats_Delta,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 54, ',')
+		END AS LOG:Status,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 55, ',')
+		END AS LOG:Domain_GUID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 56, ',')
+		END AS LOG:LOG:Session_GUID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 57, ',')
+		END AS LOG:VBin_Session_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 58, ',')
+		END AS LOG:Login_Domain,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 59, ',')
+		END AS LOG:Event_Data_2,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 60, ',')
+				WHEN '1'
+					THEN 'HeuristicTrojanWorm'
+				WHEN '2'
+					THEN 'HeuristicKeyLogger'
+				WHEN '100'
+					THEN 'CommercialRemoteControl'
+				WHEN '101'
+					THEN 'CommercialKeyLogger'
+				WHEN '200'
+					THEN 'Cookie'
+				WHEN '300'
+					THEN 'Shields'
+				END
+		END AS LOG:Eraser_Category_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 61, ',')
+				WHEN '1'
+					THEN 'MALWARE'
+				WHEN '2'
+					THEN 'SECURITY_RISK'
+				WHEN '3'
+					THEN 'POTENTIALLY_UNWANTED_APPLICATIONS'
+				WHEN '4'
+					THEN 'EXPERIMENTAL_HEURISTIC'
+				WHEN '5'
+					THEN 'LEGACY_VIRAL'
+				WHEN '6'
+					THEN 'LEGACY_NON_VIRAL'
+				WHEN '7'
+					THEN 'VATEGORY_CRIMEWARE'
+				WHEN '8'
+					THEN 'ADVANCED_HEURISTICS'
+				WHEN '9'
+					THEN 'REPUTATION_BACKED_ADVANCED_HEURISTICS'
+				WHEN '10'
+					THEN 'PREVALENCE_BACKED_ADVANCED_HEURISTICS'
+				END
+		END AS LOG:Dynamic_Categoryset_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 62, ',')
+		END AS LOG:Subcategoryset_ID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 63, ',')
+				WHEN '0'
+					THEN 'Application Name'
+				WHEN '1'
+					THEN 'VID Virus Name'
+				END
+		END AS LOG:Display_Name_To_Use,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 64, ',')
+				WHEN '0'
+					THEN 'Good'
+				WHEN '1'
+					THEN 'Bad'
+				WHEN '127'
+					THEN 'Unknown'
+				END
+		END AS LOG:Reputation_Disposition,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 65, ',')
+		END AS LOG:Reputation_Confidence,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 66, ',')
+		END AS LOG:First_Seen,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 67, ',')
+		END AS LOG:Reputation_Prevalence,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 68, ',')
+		END AS LOG:Downloaded_URL,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 69, ',')
+		END AS LOG:Creator_For_Dropper,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 70, ',')
+		END AS LOG:CIDS_State,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 71, ',')
+		END AS LOG:Behavior_Risk_Level,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 72, ',')
+				WHEN '0'
+					THEN 'Traditional'
+				WHEN '1'
+					THEN 'Heuristic'
+				END
+		END AS LOG:Detection_Type,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 73, ',')
+		END AS LOG:Acknowledge_Text,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 74, ',')
+				WHEN '0'
+					THEN 'Off'
+				WHEN '1'
+					THEN 'On'
+				WHEN ''
+					THEN 'Failed'
+				END
+		END AS LOG:VSIC_State,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 75, ',')
+		END AS LOG:Scan_GUID,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 76, ',')
+		END AS LOG:Scan_Duration,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE STRCAT(TO_STRING(ADD (
+						HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 2, 2))
+						,1
+						)), STRCAT('/', STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 4, 2))), STRCAT('/', STRCAT(TO_STRING(ADD (
+										HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 0, 2))
+										,1970
+										)), STRCAT(' ', STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 6, 2))))
+											WHEN 1
+												THEN STRCAT('0', TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 6, 2))))
+											ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 6, 2)))
+											END, STRCAT(':', STRCAT(CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 8, 2))))
+													WHEN 1
+														THEN STRCAT('0', TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 8, 2))))
+													ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 8, 2)))
+													END, STRCAT(':', CASE STRLEN(TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 10, 2))))
+														WHEN 1
+															THEN STRCAT('0', TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 10, 2))))
+														ELSE TO_STRING(HEX_TO_INT(SUBSTR(EXTRACT_TOKEN(Field9, 77, ','), 10, 2)))
+														END))))))))))
+		END AS LOG:Scan_Start_Time,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE CASE EXTRACT_TOKEN(Field9, 78, ',')
+				WHEN '0'
+					THEN 'Normal'
+				WHEN '1'
+					THEN 'Modern (Metro)'
+				END
+		END AS LOG:TargetApp,
+	CASE DIV(STRLEN(Field9), 11)
+		WHEN 1
+			THEN ''
+		WHEN NULL
+			THEN ''
+		ELSE EXTRACT_TOKEN(Field9, 79, ',')
+		END AS LOG:Scan_Command_GUID
+FROM '[LOGFILEPATH]' 
+WHERE Summary NOT IN ('Smc')
+</QueryData>
+    <QueryID>7c2d842a-bc71-43ca-b2f5-5149eb029c58</QueryID>
+    <LogType>TSVLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-04-04T10:02:12.2967582-05:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>SEP: Client Management (Control)</QueryName>
+    <QueryDescription>processlog.log</QueryDescription>
+    <QueryData>/* -headerRow:off -nSkipLines:1 -nFields:28 */
+SELECT FileName,
+    TO_TIMESTAMP(ADD(DIV(SUB(TO_REAL(HEX_TO_INT(Field10)),TO_REAL(116444736000000000)),TO_REAL(10000000)), TO_REAL(TIMESTAMP('1970','yyyy')))) AS DateAndTime,
+    HEX_TO_INT(Field4) AS Severity,
+    CASE TO_STRING(Field5) WHEN '3' THEN 'Continue'
+        WHEN '1' THEN 'Block'
+            ELSE TO_STRING(Field5)
+    END AS Action,
+    Field7 AS Description,
+    Field8 AS API,
+    Field12 AS RuleName,
+    STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field23),0,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field23),2,2))),STRCAT('.',STRCAT(TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field23),4,2))),STRCAT('.',TO_STRING(HEX_TO_INT(SUBSTR(HEX_TO_HEX32(Field23),6,2))))))))) AS IPAddress,
+    HEX_TO_INT(TO_STRING(Field13)) AS CallerProcessID,
+    Field14 AS CallerProcess,
+    Field24 AS DeviceInstanceID,
+    Field17 AS Target,
+    Field19 AS USER,
+    Field20 AS UserDomain,
+    Field18 AS Location
+FROM '[LOGFILEPATH]' 
+WHERE Field23 IS NOT NULL AND Field28 IS NULL
+ORDER BY DateAndTime DESC</QueryData>
+    <QueryID>3bd0c4ca-9242-4b05-9b70-cb5bc009c4b5</QueryID>
+    <LogType>TSVLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-04-04T10:02:38.2958631-05:00</DateModified>
   </LPQuery>
   <LPQuery>
     <QueryName>SEP: AVMan.log</QueryName>
@@ -1792,6 +2965,260 @@ WHERE EventID = 4657
     <DateModified>2017-06-20T09:38:03.9444095-05:00</DateModified>
   </LPQuery>
   <LPQuery>
+    <QueryName>Report: Suspicious Commands/Procs associated with possible Recon</QueryName>
+    <QueryDescription>List of “recon” strings to identify clusters of commands which are more likely to be indicative of an adversary performing recon on the machine or network in search of additional opportunities..</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date, 
+     EXTRACT_TOKEN(Strings, 1, '|') AS Username,
+     EXTRACT_TOKEN(Strings, 2, '|') AS Domain,
+     EXTRACT_TOKEN(Strings, 5, '|') AS Process 
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4688 AND (Process LIKE '%\\at.exe'  OR Process LIKE '%\\ceipdata.exe'  OR Process LIKE '%\\ceiprole.exe'  OR  Process LIKE '%\\chcp.exe' OR Process LIKE '%\\cmd.exe'  OR Process LIKE '%\\compmgmtlauncher.exe'  OR Process LIKE '%\\csvde.exe'  OR Process LIKE '%\\dsget.exe' OR Process LIKE '%\\dsquery.exe'  OR Process LIKE '%\\esentutl.exe'  OR Process LIKE '%\\\\find.exe'  OR Process LIKE '%\\fsutil.exe'  OR Process LIKE '%\\hostname.exe'  OR Process LIKE '%\\ipconfig.exe'  OR Process LIKE '%\\ldifde.exe'  OR Process LIKE '%\\nbtstat.exe'  OR Process LIKE '%\\net.exe'  OR Process LIKE '%\\net1.exe'  OR Process LIKE '%\\netdom.exe' OR Process LIKE '%\\netsh.exe' OR Process LIKE '%\\netstat.exe' OR Process LIKE '%\\nltest.exe' OR Process LIKE '%\\nslookup.exe' OR Process LIKE '%\\ping.exe' OR Process LIKE '%\\psexec.exe' OR Process LIKE '%\\qprocess.exe' OR Process LIKE '%\\query.exe' OR Process LIKE '%\\quser.exe' OR Process LIKE '%\\qwinsta.exe' OR Process LIKE '%\\reg.exe'  OR Process LIKE '%\\sc.exe' OR Process LIKE '%\\schtasks.exe' OR Process LIKE '%\\servermanagercmd.exe' OR Process LIKE '%\\set.exe' OR Process LIKE '%\\systeminfo.exe' OR Process LIKE '%\\tasklist.exe' OR Process LIKE '%\\time.exe' OR Process LIKE '%\\tracert.exe'  OR Process LIKE '%\\tree.exe' OR Process LIKE '%\\type.exe' OR Process LIKE '%\\vds.exe' OR Process LIKE '%\\vdsldr.exe' OR Process LIKE '%\\ver.exe' OR Process LIKE '%\\wevtutil.exe' OR Process LIKE '%\\whoami.exe' OR Process LIKE '%\\WinrsHost.exe' OR Process LIKE '%\\inver.exe' OR Process LIKE '%\\wmic.exe' OR Process LIKE '%\\wusa.exe') AND NOT Process LIKE '%\\dsregcmd.exe'</QueryData>
+    <QueryID>1c4cedbb-d49a-498c-9adb-c78f3a3a4be7</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-02-14T09:48:23.9482537-06:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Report: Summary of Process Execution</QueryName>
+    <QueryDescription>Gathers 4688 events and groups them by process</QueryDescription>
+    <QueryData>SELECT COUNT(*) AS CNT,
+     EXTRACT_TOKEN(Strings, 5, '|') AS Process, 
+     extract_token(strings, 13, '|') as ParentProcess
+FROM '[LOGFILEPATH]'
+WHERE EventID = 4688 AND (Process LIKE '%.%' AND ParentProcess LIKE '%.%')
+GROUP BY Process, ParentProcess
+ORDER BY CNT ASC</QueryData>
+    <QueryID>6586daac-1fa0-44b2-918c-99cc310284db</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>ALL</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-02-14T09:42:34.3081581-06:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Report: RDP Usage</QueryName>
+    <QueryDescription>Microsoft-Windows-TerminalServices-LocalSessionManager%4Operational 21,22,23,24,25,39,40 and Microsoft-Windows-TerminalServices-RemoteConnectionManager%4Operational 1149</QueryDescription>
+    <QueryData>Select timegenerated as Date, EventID,
+	CASE EventID WHEN 1149 THEN STRCAT(EXTRACT_TOKEN(strings, 1, '|'),STRCAT('\\',EXTRACT_TOKEN(strings, 0, '|')))
+           WHEN 39 THEN ''
+               WHEN 40 THEN '' ELSE
+                   EXTRACT_TOKEN(strings, 0, '|')
+       END as User,
+       CASE EventID WHEN 21 THEN 'Session logon succeeded'
+           WHEN 22 THEN 'Shell start notification received'
+               WHEN 23 THEN 'Session logoff succeeded'
+                   WHEN 24 THEN 'Session has been disconnected'
+                       WHEN 25 THEN 'Session reconnection succeeded'
+                           WHEN 39 THEN STRCAT('Session ',STRCAT(EXTRACT_TOKEN(strings, 0, '|'),STRCAT(' has been disconnected by session ',EXTRACT_TOKEN(strings, 1, '|'))))
+                               WHEN 40 THEN STRCAT('Session ',STRCAT(EXTRACT_TOKEN(strings, 0, '|'),' has been disconnected'))
+                               WHEN 1149 THEN 'User authentication succeeded'
+       END as Description,
+       CASE EventID WHEN 1149 THEN ''
+           WHEN 39 THEN EXTRACT_TOKEN(strings, 0, '|')
+               WHEN 40 THEN EXTRACT_TOKEN(strings, 0, '|') ELSE
+                   EXTRACT_TOKEN(strings, 1, '|')
+       END as SessionID,
+       CASE EventID WHEN 39 THEN EXTRACT_TOKEN(strings, 1, '|') END AS SourceSessionID,
+       CASE EventID WHEN 40 THEN 
+           CASE EXTRACT_TOKEN(strings, 1, '|') WHEN '0' THEN 'No additional information is available' 
+               WHEN '1' THEN 'An application initiated the disconnection'
+                   WHEN '2' THEN 'An application logged off the client'
+                       WHEN '3' THEN 'The server has disconnected the client because the client has been idle for a period of time longer than the designated time-out period'
+                           WHEN '4' THEN 'The server has disconnected the client because the client has exceeded the period designated for connection'
+                               WHEN '5' THEN 'The clients connection was replaced by another connection'
+                                   WHEN '6' THEN 'No memory is available'
+                                       WHEN '7' THEN 'The server denied the connection'
+                                           WHEN '8' THEN 'The server denied the connection for security reasons'
+                                               WHEN '9' THEN 'The server denied the connection for security reasons'
+                                                   WHEN '10' THEN 'Fresh credentials are required'
+                                                       WHEN '11' THEN 'User activity has initiated the disconnect'
+                                                           WHEN '12' THEN 'The user logged off, disconnecting the session'
+                                                               WHEN '256' THEN 'Internal licensing error'
+                                                                   WHEN '257' THEN 'No license server was available'
+                                                                       WHEN '258' THEN 'No valid software license was available'
+                                                                           WHEN '259' THEN 'The remote computer received a licensing message that was not valid'
+                                                                               WHEN '260' THEN 'The hardware ID does not match the one designated on the software license'
+                                                                                   WHEN '261' THEN 'Client license error'
+                                                                                       WHEN '262' THEN 'Network problems occurred during the licensing protocol'
+                                                                                           WHEN '263' THEN 'The client ended the licensing protocol prematurely'
+                                                                                               WHEN '264' THEN 'A licensing message was encrypted incorrectly'
+                                                                                                   WHEN '265' THEN 'The local computers client access license could not be upgraded or renewed'
+                                                                                                       WHEN '266' THEN 'The remote computer is not licensed to accept remote connections'
+                                                                                                           WHEN '267' THEN 'An access denied error was received while creating a registry key for the license store'
+                                                                                                               WHEN '768' THEN 'Invalid credentials were encountered'
+               ELSE EXTRACT_TOKEN(strings, 1, '|') END END as ReasonCode,
+	EXTRACT_TOKEN(strings, 2, '|') as SourceIP
+FROM '[LOGFILEPATH]'
+WHERE (SourceName = 'Microsoft-Windows-TerminalServices-LocalSessionManager' AND (EventID = 21 or EventID = 22 or EventID = 23 or EventID = 24 or EventID = 25 or EventID = 39 or EventID = 40)) OR (SourceName = 'Microsoft-Windows-TerminalServices-RemoteConnectionManager' AND EventID = 1149)
+</QueryData>
+    <QueryID>e8f52f31-54e2-4ef6-a84b-901c30f9f172</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-02-26T13:38:12.07074-06:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Report: Logon, Logoff</QueryName>
+    <QueryDescription>Security events 4624,4625,4634,4647,4648,4778,4779</QueryDescription>
+    <QueryData>SELECT TimeGenerated AS Date, EventID,
+       CASE EventID WHEN 4624 THEN 'An account was successfully logged on'
+           WHEN 4625 THEN 'An account failed to log on'           
+               WHEN 4634 THEN 'An account was logged off'
+                   WHEN 4647 THEN 'User initiated logoff'
+                       WHEN 4648 THEN 'A logon was attempted using explicit credentials'
+                           WHEN 4672 THEN 'Special privileges assigned to new logon'
+                               WHEN 4778 THEN 'A session was reconnected to a Window Station'
+                                   WHEN 4779 THEN 'A session was disconnected from a Window Station'
+                                       WHEN 4800 THEN 'The workstation was locked'
+                                           WHEN 4801 THEN 'The workstation was unlocked'
+                                               WHEN 4802 THEN 'The screen saver was invoked'
+                                                   WHEN 4803 THEN 'The screen saver was dismissed'
+       END as Description,
+	CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(Strings, 5, '|')
+           WHEN 4625 THEN EXTRACT_TOKEN(Strings, 5, '|')           
+               WHEN 4634 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                   WHEN 4647 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                       WHEN 4648 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                           WHEN 4672 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                               WHEN 4778 THEN EXTRACT_TOKEN(Strings, 0, '|')
+                                   WHEN 4779 THEN EXTRACT_TOKEN(Strings, 0, '|')
+                                       WHEN 4800 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                                           WHEN 4801 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                                               WHEN 4802 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                                                   WHEN 4803 THEN EXTRACT_TOKEN(Strings, 1, '|')
+       END as Username,
+	CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(Strings, 6, '|')
+           WHEN 4625 THEN EXTRACT_TOKEN(Strings, 6, '|')
+               WHEN 4634 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                   WHEN 4647 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                       WHEN 4648 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                           WHEN 4672 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                               WHEN 4778 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                                   WHEN 4779 THEN EXTRACT_TOKEN(Strings, 1, '|')
+                                       WHEN 4800 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                                           WHEN 4801 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                                               WHEN 4802 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                                                   WHEN 4803 THEN EXTRACT_TOKEN(Strings, 2, '|')
+       END as Domain,
+       CASE EventID WHEN 4648 THEN STRCAT(EXTRACT_TOKEN(Strings, 6, '|'),STRCAT('\\',EXTRACT_TOKEN(Strings, 5, '|'))) END AS CredentialsUsed,
+       CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(Strings, 7, '|')
+           WHEN 4624 THEN EXTRACT_TOKEN(Strings, 7, '|')
+               WHEN 4634 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                   WHEN 4647 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                       WHEN 4648 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                           WHEN 4672 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                               WHEN 4778 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                                   WHEN 4779 THEN EXTRACT_TOKEN(Strings, 2, '|')
+                                       WHEN 4800 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                                           WHEN 4801 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                                               WHEN 4802 THEN EXTRACT_TOKEN(Strings, 3, '|')
+                                                   WHEN 4803 THEN EXTRACT_TOKEN(Strings, 3, '|')
+       END AS LogonID,
+       CASE EventID WHEN 4778 THEN EXTRACT_TOKEN(Strings, 3, '|') 
+           WHEN 4779 THEN EXTRACT_TOKEN(Strings, 3, '|')
+               WHEN 4800 THEN EXTRACT_TOKEN(Strings, 4, '|')
+                   WHEN 4801 THEN EXTRACT_TOKEN(Strings, 4, '|')
+                       WHEN 4802 THEN EXTRACT_TOKEN(Strings, 4, '|')
+                           WHEN 4803 THEN EXTRACT_TOKEN(Strings, 4, '|')
+       END AS SessionName,
+       REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(Strings, 8, '|')
+           WHEN 4625 THEN EXTRACT_TOKEN(Strings, 10, '|')
+               WHEN 4634 THEN EXTRACT_TOKEN(Strings, 4, '|')
+       END,'2','Logon via console'),'3','Network Logon'),'4','Batch Logon'),'5','Windows Service Logon'),'7','Credentials used to unlock screen'),'8','Network logon sending credentials (cleartext)'),'9','Different credentials used than logged on user'),'10','Remote interactive logon (RDP)'),'11','Cached credentials used to logon'),'12','Cached remote interactive (similar to Type 10)'),'13','Cached unlock (similar to Type 7)') AS LogonType,
+       CASE EventID WHEN 4625 THEN 
+           CASE EXTRACT_TOKEN(strings, 7, '|') WHEN '0xc000005e' THEN 'There are currently no logon servers available to service the logon request'
+               WHEN '0xc0000064' THEN 'user name does not exist'
+                   WHEN '0xc000006a' THEN 'user name is correct but the password is wrong'
+                       WHEN '0xc000006d' THEN 'user logon with misspelled or bad password'
+                           WHEN '0xc000006e' THEN 'unknown user name or bad password'
+                               WHEN '0xc000006f' THEN 'user tried to logon outside his day of week or time of day restrictions'
+                                   WHEN '0xc0000070' THEN 'workstation restriction, or Authentication Policy Silo violation (look for event ID 4820 on domain controller)'
+                                       WHEN '0xc0000071' THEN 'expired password'
+                                           WHEN '0xc0000072' THEN 'account is currently disabled'
+                                               WHEN '0xc00000dc' THEN 'Indicates the Sam Server was in the wrong state to perform the desired operation.'
+                                                   WHEN '0xc0000133' THEN 'clocks between DC and other computer too far out of sync'
+                                                       WHEN '0xc000015b' THEN 'The user has not been granted the requested logon type (aka logon right) at this machine'
+                                                           WHEN '0xc000018c' THEN 'The logon request failed because the trust relationship between the primary domain and the trusted domain failed'
+                                                               WHEN '0xc0000192' THEN 'An attempt was made to logon, but the netlogon service was not started'
+                                                                   WHEN '0xc0000193' THEN 'account expiration'
+                                                                       WHEN '0xc0000224' THEN 'user is required to change password at next logon'
+                                                                           WHEN '0xc0000225' THEN 'evidently a bug in Windows and not a risk'
+                                                                               WHEN '0xc0000234' THEN 'user is currently locked out'
+                                                                                   WHEN '0xc00002ee' THEN 'Failure Reason: An Error occurred during Logon'                                                                               
+                                                                                       WHEN '0xc0000413' THEN 'Logon Failure: The machine you are logging onto is protected by an authentication firewall. The specified account is not allowed to authenticate to the machine' ELSE
+                                                                                           EXTRACT_TOKEN(strings, 7, '|')
+       END END AS Status,
+       CASE EventID WHEN 4625 THEN 
+           CASE EXTRACT_TOKEN(strings, 9, '|') WHEN '0xc000005e' THEN 'There are currently no logon servers available to service the logon request'
+               WHEN '0xc0000064' THEN 'user name does not exist'
+                   WHEN '0xc000006a' THEN 'user name is correct but the password is wrong'
+                       WHEN '0xc000006d' THEN 'user logon with misspelled or bad password'
+                           WHEN '0xc000006e' THEN 'unknown user name or bad password'
+                               WHEN '0xc000006f' THEN 'user tried to logon outside his day of week or time of day restrictions'
+                                   WHEN '0xc0000070' THEN 'workstation restriction, or Authentication Policy Silo violation (look for event ID 4820 on domain controller)'
+                                       WHEN '0xc0000071' THEN 'expired password'
+                                           WHEN '0xc0000072' THEN 'account is currently disabled'
+                                               WHEN '0xc00000dc' THEN 'Indicates the Sam Server was in the wrong state to perform the desired operation.'
+                                                   WHEN '0xc0000133' THEN 'clocks between DC and other computer too far out of sync'
+                                                       WHEN '0xc000015b' THEN 'The user has not been granted the requested logon type (aka logon right) at this machine'
+                                                           WHEN '0xc000018c' THEN 'The logon request failed because the trust relationship between the primary domain and the trusted domain failed'
+                                                               WHEN '0xc0000192' THEN 'An attempt was made to logon, but the netlogon service was not started'
+                                                                   WHEN '0xc0000193' THEN 'account expiration'
+                                                                       WHEN '0xc0000224' THEN 'user is required to change password at next logon'
+                                                                           WHEN '0xc0000225' THEN 'evidently a bug in Windows and not a risk'
+                                                                               WHEN '0xc0000234' THEN 'user is currently locked out'
+                                                                                   WHEN '0xc00002ee' THEN 'Failure Reason: An Error occurred during Logon'                                                                               
+                                                                                       WHEN '0xc0000413' THEN 'Logon Failure: The machine you are logging onto is protected by an authentication firewall. The specified account is not allowed to authenticate to the machine' ELSE
+                                                                                           EXTRACT_TOKEN(strings, 9, '|')
+       END END AS SubStatus,
+/*       CASE EventID WHEN 4625 THEN EXTRACT_TOKEN(strings, 7, '|') END AS Status, */
+/*       CASE EventID WHEN 4625 THEN EXTRACT_TOKEN(strings, 9, '|') END AS SubStatus, */
+	CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(strings, 9, '|')
+           WHEN 4625 THEN EXTRACT_TOKEN(strings, 11, '|') 
+       END AS AuthPackage,
+	CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(Strings, 11, '|')
+           WHEN 4625 THEN EXTRACT_TOKEN(Strings, 13, '|')
+               WHEN 4648 THEN EXTRACT_TOKEN(Strings, 8, '|')
+                   WHEN 4778 THEN EXTRACT_TOKEN(Strings, 4, '|')
+                       WHEN 4779 THEN EXTRACT_TOKEN(Strings, 4, '|')
+       END AS Workstation,
+	CASE EventID WHEN 4624 THEN EXTRACT_TOKEN(Strings, 18, '|')
+           WHEN 4625 THEN EXTRACT_TOKEN(Strings, 19, '|')
+               WHEN 4648 THEN EXTRACT_TOKEN(Strings, 12, '|')
+                   WHEN 4778 THEN EXTRACT_TOKEN(Strings, 5, '|')
+                       WHEN 4779 THEN EXTRACT_TOKEN(Strings, 5, '|')
+       END AS SourceIP
+
+FROM '[LOGFILEPATH]'
+WHERE EventID IN (4624;4625;4634;4647;4648;4672;4778;4779;4800;4801;4802;4803) AND
+	Username NOT IN ('SYSTEM'; 'ANONYMOUS LOGON'; 'LOCAL SERVICE'; 'NETWORK SERVICE') AND
+		Domain NOT IN ('NT AUTHORITY')</QueryData>
+    <QueryID>fd8c1f54-5c8e-490d-b4a2-5133f3dc6cd4</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-03-06T07:14:52.2795865-06:00</DateModified>
+  </LPQuery>
+  <LPQuery>
+    <QueryName>Report: Detailed Network Share Access</QueryName>
+    <QueryDescription>Security eventid 5145</QueryDescription>
+    <QueryData>select TimeGenerated, EventID,
+'A network share object was checked to see whether client can be granted desired access.' AS Description,
+extract_token(Strings,1,'|') as Username,
+extract_token(Strings,2,'|') as Domain,
+extract_token(Strings,3,'|') as LogonID,
+extract_token(Strings,5,'|') as SourceIP, 
+extract_token(Strings,7,'|') as SharePath,
+extract_token(Strings,9,'|') as RelativeTargetFileName,
+REPLACE_CHR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(REPLACE_STR(extract_token(Strings,11,'|'),'%%1537\u000D\u000A','DELETE, '),'%%1538\u000D\u000A','READ_CONTROL, '),'%%1539\u000D\u000A','WRITE_DAC, '),'%%1540\u000D\u000A','WRITE_OWNER, '),'%%1541\u000D\u000A','SYNCHRONIZE, '),'%%1542\u000D\u000A','ACCESS_SYS_SEC, '),'%%4416\u000D\u000A','ReadData (or ListDirectory), '),'%%4417\u000D\u000A','WriteData (or AddFile), '),'%%4418\u000D\u000A','AppendData (or AddSubdirectory), '),'%%4419\u000D\u000A','ReadEA, '),'%%4420\u000D\u000A','WriteEA, '),'%%4421\u000D\u000A','Execute (or Traverse), '),'%%4422\u000D\u000A','DeleteChild, '),'%%4423\u000D\u000A','ReadAttributes, '),'%%4424\u000D\u000A','WriteAttributes, '),'\u0009','') AS Accesses
+from '[LOGFILEPATH]'  where eventid=5145</QueryData>
+    <QueryID>208544bd-fed3-4e32-9790-cb03a50720b1</QueryID>
+    <LogType>EVTLOG</LogType>
+    <QueryCategory>FAV</QueryCategory>
+    <IsFavorite>true</IsFavorite>
+    <DateModified>2019-02-27T11:26:49.6171034-06:00</DateModified>
+  </LPQuery>
+  <LPQuery>
     <QueryName>REGISTRY: Writes Since Previous Date</QueryName>
     <QueryDescription>Find all Key\Values written to since the chosen date</QueryDescription>
     <QueryData>/*  Find Registry values that have been writtin to since ??? */
@@ -2134,19 +3561,5 @@ ORDER BY Date DESC</QueryData>
     <QueryCategory>FAV</QueryCategory>
     <IsFavorite>true</IsFavorite>
     <DateModified>2018-10-29T09:18:29.2046502-05:00</DateModified>
-  </LPQuery>
-  <LPQuery>
-    <QueryName>Application: Msinstaller</QueryName>
-    <QueryDescription>Event 11707</QueryDescription>
-    <QueryData>SELECT TimeGenerated AS Date,
-EXTRACT_TOKEN(Strings,0,'|') AS Description,
-RESOLVE_SID(SID) AS User 
-FROM '[LOGFILEPATH]'
-WHERE EventId = 11707</QueryData>
-    <QueryID>13e887e6-d869-4be5-8052-e5fe883ad390</QueryID>
-    <LogType>EVTLOG</LogType>
-    <QueryCategory>FAV</QueryCategory>
-    <IsFavorite>true</IsFavorite>
-    <DateModified>2018-10-03T13:06:14.1097063-05:00</DateModified>
   </LPQuery>
 </ArrayOfLPQuery>
